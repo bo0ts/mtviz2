@@ -4,9 +4,82 @@
     <script type="text/javascript" src="protovis-r3.2.js"></script>
     <script type="text/javascript" src="data.js"></script>
   </head>
-  <body><div id="center"><div id="fig">
-	<script type="text/javascript+protovis">
-	  
-	</script>
-  </div></div></body>
+    <body><div id="center">
+    <script type="text/javascript+protovis">
+    var data = mt1;
+    var max = pv.max(data, function(d) d.end );
+
+    var w = 900,
+    h = 800,
+    r = 300,
+    a = pv.Scale.linear(0, max).range(0, 2 * Math.PI),
+    b = pv.Scale.linear(0, max).range(0, 880),
+    bottom = 470,
+    left = w / 2;
+
+
+
+      var vis = new pv.Panel()
+      .width(w)
+      .height(h);
+
+vis.add(pv.Wedge)
+    .data([1])
+    .bottom(bottom)
+    .left(left)
+    .outerRadius(r)
+    .innerRadius(r-40)
+    .startAngle(0)
+    .angle(2*Math.PI)
+    .fillStyle("rgb(0,0,0)");
+
+//data
+vis.add(pv.Wedge)
+    .data(data)
+    .bottom(bottom)
+    .left(left)
+    .outerRadius(r)
+    .innerRadius(r-40)
+    .startAngle(function(d) a(d.start))
+    .angle(function(d) a(d.end - d.start))
+    .anchor("center").add(pv.Label)
+    .text(function(d) d.name);
+
+//ticks
+vis.add(pv.Wedge)
+    .data(data)
+    .startAngle(function(d) a(d.start))
+    .bottom(bottom)
+    .left(left)
+    .outerRadius(r+5)
+    .innerRadius(r-45)
+    .fillStyle(null)
+    .strokeStyle("black")
+    .angle(0)
+    .anchor("outer").add(pv.Label)
+    .textMargin(50)
+    .text(function(d) d.start);
+
+    vis.add(pv.Bar)
+    .data([max])
+    .left(function(d) b(0))
+    .width(function(d) b(d))
+    .bottom(20)
+    .height(20)
+    .fillStyle("white")
+    .strokeStyle("black");
+
+    vis.add(pv.Bar)
+    .data(data)
+    .left(function(d) b(d.start))
+    .width(function(d) b(d.end - d.start))
+    .bottom(20)
+    .height(20)
+    .strokeStyle("black");
+
+
+    vis.render();
+
+    </script>
+  </div></body>
 </html>

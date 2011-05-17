@@ -31,7 +31,8 @@ var mt1 = [
     { type: "NC_006666", start: 14840, end: 14911, name: "trnF", foo: ".", strand: "+" },
     { type: "NC_006666", start: 15812, end: 15881, name: "trnE", foo: ".", strand: "+" },
     { type: "NC_006666", start: 15884, end: 15955, name: "trnT", foo: ".", strand: "+" }
-]
+];
+
 var mt2 = [
     { type: "NC_010642", start: 0, end: 927, name: "OH", foo: ".", strand: "+" },
     { type: "NC_010642", start: 927, end: 998, name: "trnF", foo: ".", strand: "+" },
@@ -72,4 +73,4 @@ var mt2 = [
     { type: "NC_010642", start: 16242, end: 16312, name: "trnT", foo: ".", strand: "+" },
     { type: "NC_010642", start: 16312, end: 16379, name: "trnP", foo: ".", strand: "-" },
     { type: "NC_010642", start: 16379, end: 16990, name: "OH", foo: ".", strand: "+" }
-]
+];
