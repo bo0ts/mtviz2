@@ -3,83 +3,100 @@
     <title>mtviz2</title>
     <script type="text/javascript" src="protovis-r3.2.js"></script>
     <script type="text/javascript" src="data.js"></script>
+    <script type="text/javascript" src="utility.js"></script>
   </head>
     <body><div id="center">
     <script type="text/javascript+protovis">
-    var data = mt1;
-    var max = pv.max(data, function(d) d.end );
 
-    var w = 900,
-    h = 800,
-    r = 300,
-    a = pv.Scale.linear(0, max).range(0, 2 * Math.PI),
-    b = pv.Scale.linear(0, max).range(0, 880),
-    bottom = 470,
-    left = w / 2;
+// setup panels and sizes
+var r = 300,
+barsize = 30,
+width = r*2,
+lines = 2,
+margin = 20,
+shift_in = barsize/2;
 
+// root, "fullscreen"
+var vis = new pv.Panel()
+    .width(1440)
+    .height(990);
 
+var p1 = vis.add(pv.Panel)
+    .width(width + margin)
+    .height(width + margin);
 
-      var vis = new pv.Panel()
-      .width(w)
-      .height(h);
+var p2 = vis.add(pv.Panel)
+    .width(width + margin)
+//2 bars per line - shift and as much margin as we have lines
+    .height((2*lines*barsize)-shift_in + margin*lines)
+    .top(r*2 + margin);
 
-vis.add(pv.Wedge)
-    .data([1])
-    .bottom(bottom)
-    .left(left)
-    .outerRadius(r)
-    .innerRadius(r-40)
-    .startAngle(0)
-    .angle(2*Math.PI)
-    .fillStyle("rgb(0,0,0)");
+// data massage
+var data = mt1, max = pv.max(data, function(d) d.end );
 
-//data
-vis.add(pv.Wedge)
+var smalls = new Array();
+//strip down trn sequence names and mark the small
+for(var i in data) {
+    if(data[i].name.indexOf("trn") == 0) {
+	smalls.push(data[i]);
+	data[i].name = data[i].name.substr(3, data[i].name.substr.length);
+        data[i].isSmall = true;
+    }
+}
+
+// //all data points that require ticks
+var ticks = new Array();
+for(var i in data) { ticks.push(data[i].start, data[i].end); } 
+ticks = ticks.unique();
+// XXX what?
+ticks.pop();
+
+// wedge graphics
+var ws = pv.Scale.linear(0, max).range(0, 2 * Math.PI);
+
+var wedge = p1.add(pv.Wedge)
     .data(data)
-    .bottom(bottom)
-    .left(left)
-    .outerRadius(r)
-    .innerRadius(r-40)
-    .startAngle(function(d) a(d.start))
-    .angle(function(d) a(d.end - d.start))
+    .top(r)
+    .left(r)
+    .strokeStyle("white")
+    .lineWidth(1)
+    .outerRadius(function(d) { 
+    	if(d.strand == "-") { return (r - barsize + shift_in); } 
+    	else { return r; }
+    })
+    .innerRadius(function(d) {
+	if(d.strand == "-") { return (r - barsize*2 + shift_in); } 
+    	else { return r - barsize; }
+    })
+    .startAngle(function(d) ws(d.start))
+    .angle(function(d) ws(d.end - d.start))
     .anchor("center").add(pv.Label)
-    .text(function(d) d.name);
+    .text(function(d) { if(!d.isSmall) return d.name; else return ""; })
+    .textAngle(function(d) Math.PI/2 + ws(d.start + Math.abs((d.start - d.end) / 2)) );
 
-//ticks
-vis.add(pv.Wedge)
+// bars //
+// annotate the data with the line they belong on
+
+// array of scales from minimal start to maximal end in each line scale from 
+var bs = pv.Scale.linear(0, max).range(0, width), bottom = 20;
+
+p2.add(pv.Bar)
     .data(data)
-    .startAngle(function(d) a(d.start))
-    .bottom(bottom)
-    .left(left)
-    .outerRadius(r+5)
-    .innerRadius(r-45)
-    .fillStyle(null)
-    .strokeStyle("black")
-    .angle(0)
-    .anchor("outer").add(pv.Label)
-    .textMargin(50)
-    .text(function(d) d.start);
+    .left(function(d) bs(d.start))
+    .width(function(d) bs(d.end - d.start))
+    .bottom(function(d) { if(d.strand == "-") return bottom;
+    	                  else return bottom + (barsize - shift_in); })
+    .height(30)
+    .lineWidth(1)
+    // .fillStyle(function(d) { if(d.strand == "-") return "blue";
+    // 	                     else return "red"; })
+    .strokeStyle("white")
+    .anchor("center").add(pv.Label)
+    .text(function(d) { if(!d.isSmall) return d.name; else return ""; });
 
-    vis.add(pv.Bar)
-    .data([max])
-    .left(function(d) b(0))
-    .width(function(d) b(d))
-    .bottom(20)
-    .height(20)
-    .fillStyle("white")
-    .strokeStyle("black");
-
-    vis.add(pv.Bar)
-    .data(data)
-    .left(function(d) b(d.start))
-    .width(function(d) b(d.end - d.start))
-    .bottom(20)
-    .height(20)
-    .strokeStyle("black");
-
-
-    vis.render();
+vis.render();
 
     </script>
-  </div></body>
+  </div>
+</body>
 </html>
