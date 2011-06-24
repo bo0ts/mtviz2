@@ -30,6 +30,16 @@
 {	float: none;
 	display: inline}
 
+#slider
+{	width: auto;
+        background: #A9C251;
+        color: #24313C;
+        padding:10}
+
+#slider:hover
+{	background: #8EA344}
+
+
 #jsddm li ul li a
 {	width: auto;
 	background: #A9C251;

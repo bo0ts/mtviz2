@@ -10,7 +10,6 @@
     <link rel="stylesheet" type="text/css" href="style.css" />
   </head>
     <body>
-      <!-- <input type="file" id="input" onchange="parseBED(this.files)"> -->
       <div id="head">
       <script type="text/javascript">
         function update(variable, value) {
@@ -57,19 +56,20 @@
       <ul id="jsddm">
         <li><a href="#">Files</a>
           <ul>
-            <li><a href="#">BED File</a></li>
+            <li><div id="slider">BED File<input type="file" id="input" onchange="handle(this.files)"></div></li>
             <li><a href="#">Annotations</a></li>
           </ul>
         </li>
-        <li><a href="#">Configuration</a>
+        <li><a href="#">Bars</a>
           <ul>
-            <li>Slide Effect <input type="range" name="barsize_s"
-            min="0" max="100" onChange="update(barsize, this.value)" /> </li>
+            <li><div id="slider">Barsize<input type="range" name="barsize_s" min="10"
+            max="100" value="30" onChange="update(barsize, this.value)" /> </div></li>
 
-            <li><a href="#">Fade Effect</a></li>
-            <li><a href="#">Opacity Mode</a></li>
-            <li><a href="#">Drop Shadow</a></li>
-            <li><a href="#">Semitransparent</a></li>
+            <li><div id="slider">Radius/Width<input type="range" name="width_s" min="200"
+            max="400" onChange="update(r, this.value)" /></div></li>
+
+            <li><div id="slider">Shift out<input type="range" name="shiftout_s" min="0"
+            max="100" onChange="update(shift_out, this.value)" /><div></li>
           </ul>
         </li>
       </ul>
@@ -92,7 +92,7 @@ var p2 = vis.add(pv.Panel)
     .top(r*2 + margin);
 
 // data massage
-var data = mt1, max = pv.max(data, function(d) d.end );
+var data = mt2, max = pv.max(data, function(d) d.end );
 
 var smalls = new Array();
 //strip down trn sequence names and mark the small
@@ -135,17 +135,43 @@ var wedge = p1.add(pv.Wedge)
     .textAngle(function(d) Math.PI/2 + ws(d.start + Math.abs((d.start - d.end) / 2)) );
 
 // bars //
-// annotate the data with the line they belong on
+// annotate the data with the line they belong to
+function data_line(data, max_size) {
+    var line = 0;
+    for(var j in data) {
+        if(data[j].end > max_size) {
+            ++line;
+            data[j].line = line;
+            max_size += max_size;
+        } else {
+            data[j].line = line;
+        }
+    }
+}
+
+console.log(data);
 
 // array of scales from minimal start to maximal end in each line scale from
-var bs = pv.Scale.linear(0, max).range(0, width), bottom = 20;
+data_line(data, max/lines);
+var bottom = 0;
+var line_val1 = 0;
+var line_val2 = max/lines;
+var bar_scales = new Array();
+for(var i = 0; i < lines; ++i) {
+    console.log(line_val1);
+    console.log(line_val2);
+    bar_scales.push(pv.Scale.linear(line_val1, line_val2).range(0, width));
+    line_val1 += line_val2;
+    line_val2 += line_val2;             
+}
 
 p2.add(pv.Bar)
     .data(data)
-    .left(function(d) bs(d.start))
-    .width(function(d) bs(d.end - d.start))
-    .bottom(function(d) { if(d.strand == "-") return bottom;
-    	                  else return bottom + (barsize - shift_in); })
+    .left(function(d) bar_scales[d.line](d.start))
+    .width(function(d) bar_scales[d.line](d.end - d.start))
+    .bottom(function(d) { return (barsize+margin) * d.line; })
+        // if(d.strand == "-") return bottom;
+    	//                   else return bottom + (barsize - shift_in); })
     .height(30)
     .lineWidth(1)
     // .fillStyle(function(d) { if(d.strand == "-") return "blue";
