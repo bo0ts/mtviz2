@@ -1,3 +1,15 @@
+///hide the inner ul
+function hide(e) {
+    var ul = e.getElementsByTagName("ul");
+    for(var i in ul) {
+        if(ul[i].style.visibility != "hidden") {
+            ul[i].style.visibility = "hidden"; 
+        } else {
+            ul[i].style.visibility = "visible"; 
+        }
+    }
+}
+
 Array.prototype.unique = function() {
     var a = [];
     var l = this.length;
