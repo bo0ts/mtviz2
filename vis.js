@@ -45,7 +45,7 @@ function data_line(data, max_size) {
 function reload() {
     //globals
     width = r*2;
-    max = pv.max(data, function(d) d.end )
+    max = pv.max(data, function(d) { return d.end; } );
 
     var smalls = new Array();
     //strip down trn sequence names and mark the small
@@ -90,17 +90,17 @@ function reload() {
 	    if(d.strand == "-") { return (r - barsize*2 + shift_in); }
     	    else { return r - barsize; }
         })
-        .startAngle(function(d) ws(d.start))
-        .angle(function(d) ws(d.end - d.start))
+        .startAngle(function(d) { return ws(d.start); })
+        .angle(function(d) { return ws(d.end - d.start); })
         .anchor("center").add(pv.Label)
         .text(function(d) { if(!d.isSmall) return d.name; else return ""; })
-        .textAngle(function(d) Math.PI/2 + ws(d.start + Math.abs((d.start - d.end) / 2)) );
+        .textAngle(function(d) { return Math.PI/2 + ws(d.start + Math.abs((d.start - d.end) / 2)); } );
 
     // bars //
     bar
         .data(data)
-        .left(function(d) bar_scales[d.line](d.start))
-        .width(function(d) bar_scales[d.line](d.end - d.start))
+        .left(function(d) { return bar_scales[d.line](d.start); })
+        .width(function(d) { return  bar_scales[d.line](d.end - d.start); })
         .bottom(function(d) { return (barsize+margin) * d.line; })
     // if(d.strand == "-") return bottom;
     //                   else return bottom + (barsize - shift_in); })

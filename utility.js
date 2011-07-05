@@ -1,12 +1,14 @@
 ///hide the inner ul
 function hide(e) {
+    //magic, only do it when we came from li
+    e = e.parentNode;
     var ul = e.getElementsByTagName("ul");
-    for(var i in ul) {
-        if(ul[i].style.visibility != "hidden") {
-            ul[i].style.visibility = "hidden"; 
-        } else {
-            ul[i].style.visibility = "visible"; 
-        }
+    if(!ul[0].style.visibility) ul[0].style.visibility = "hidden";
+    
+    if(ul[0].style.visibility != "hidden") {
+        ul[0].style.visibility = "hidden"; 
+    } else {
+        ul[0].style.visibility = "visible"; 
     }
 }
 

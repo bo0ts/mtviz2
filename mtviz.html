@@ -11,13 +11,13 @@
     <body>
       <div id="head">
       <ul id="jsddm">
-        <li onclick="hide(this);"><a href="#">Files</a>
-          <ul onclick="console.log(barsize);">
-            <li onclick="console.log(barsize);">BED File<input type="file" id="input" onchange="handle(this.files)"></li>
-            <li onclick="console.log(barsize);">Annotations</li>
+        <li><a href="#" onclick="hide(this);">Files</a>
+          <ul>
+            <li>BED File<input type="file" id="input" onchange="handle(this)"></li>
+            <li>Annotations</li>
           </ul>
         </li>
-        <li onclick="hide(this);"><a href="#">Bars</a>
+        <li><a href="#" onclick="hide(this);">Bars</a>
           <ul>
             <li>Barsize
               <input type="range" min="10" max="100" value="30" onchange="update(barsize, this.value);" /></li>

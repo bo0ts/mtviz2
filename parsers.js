@@ -1,12 +1,14 @@
-function handle(file) {
+function handle(evt) {
     var reader = new FileReader();
-    console.log("handling");
-    console.log(file[0].name);
-    reader.onload = function() { parseBED(this.result); console.log("load end"); };
-    reader.readAsText(file[0]);
+    var file = evt.files[0];
+    console.log("handling: " + file.name);
+    reader.onloadstart = function() { console.log("starting"); }
+    reader.onload = function(e) { parseBED(e.target.result); console.log("load end"); };
+    reader.readAsText(file);
 }
 
 function parseBED(bed_string) {
+    console.log("parsing");
     //windows/unix line endings
     var lines = bed_string.split(/\r\n|\r|\n/);
     if(lines[lines.length - 1] == "") {
@@ -27,7 +29,7 @@ function parseBED(bed_string) {
         obj.strand = elems[5];
         arr.push(obj);
     }
-
+    
     data = arr;
     console.log("parsed genes: " + arr.length);
     console.log(data[0]);
