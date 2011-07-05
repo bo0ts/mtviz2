@@ -1,3 +1,4 @@
+
 ///hide the inner ul
 function hide(e) {
     //magic, only do it when we came from li
@@ -25,3 +26,9 @@ Array.prototype.unique = function() {
     }
     return a;
 };
+
+function set_g_name(name,e) {
+    window[name] = e;
+    reload();
+    vis.render();
+}

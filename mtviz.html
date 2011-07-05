@@ -20,10 +20,11 @@
         <li><a href="#" onclick="hide(this);">Bars</a>
           <ul>
             <li>Barsize
-              <input type="range" min="10" max="100" value="30" onchange="update(barsize, this.value);" /></li>
+              <input type="range" min="10" max="100" value="30" name="barsize" onchange="set_g_name(this.name, this.value);" /></li>
             <li>Radius/Width 
-              <input type="range" style="align: right" min="200" max="400" onchange="update(r, this.value)" /></li>
-            <li>Shift out<input type="range" min="0"  max="100" onchange="update(shift_out, this.value)" /></li>
+              <input type="range" style="align: right" min="200" max="400" name="r" onchange="set_g_name(this.name, this.value);" /></li>
+            <li>Shift
+              <input type="range" min="0"  max="100" value="0" name="shift" onchange="set_g_name(this.name, this.value);" /></li>
           </ul>
         </li>
       </ul>
