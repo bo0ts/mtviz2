@@ -20,21 +20,29 @@
         <li><a href="#" onclick="hide(this);">Bars</a>
           <ul>
             <li>Barsize
-              <input type="range" min="10" max="100" value="30" name="barsize" onchange="set_g_name(this.name, this.value);" /></li>
+              <input type="range" min="10" max="100" value="30" name="barsize" onchange="set_g_name(this.name, this.value);" />
+            </li>
             <li>Radius/Width 
-              <input type="range" style="align: right" min="200" max="400" name="r" onchange="set_g_name(this.name, this.value);" /></li>
+              <input type="range" style="align: right" min="200" max="400" name="r" onchange="set_g_name(this.name, this.value);" />
+            </li>
             <li>Shift
-              <input type="range" min="0"  max="100" value="0" name="shift" onchange="set_g_name(this.name, this.value);" /></li>
+              <input type="range" min="0"  max="100" value="0" name="shift" onchange="set_g_name(this.name, this.value);" />
+            </li>
+            <li>Line number
+              <input type="range" min="1"  max="5" value="1" name="lines" onchange="set_g_name(this.name, this.value);" />
+            </li>
           </ul>
         </li>
       </ul>
       </div>
       
       <div id="center">
+        <center>
         <script type="text/javascript">
           reload();
           vis.render();
         </script>
+        <center>
       </div>
 </body>
 </html>
