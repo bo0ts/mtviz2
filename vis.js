@@ -3,15 +3,15 @@ var r = 300,
 barsize = 30,
 width = r*2,
 lines = 1,
-margin = 20,
+margin = 5,
 shift = 0,
-max, data = mt2, smalls,
-ws, bar_scale;
+max, data = mt2, annotations = new Array(), smalls = new Array(),
+ws, bar_scale, heat_scale;
 
 // setup panels and sizes
 // root, "fullscreen"
 var vis = new pv.Panel()
-    .width(1440)
+    .widthn(1440)
     .height(990);
 
 var p1 = vis.add(pv.Panel)
@@ -24,30 +24,17 @@ var p2 = vis.add(pv.Panel)
     .top(width + margin);
 
 var wedge = p1.add(pv.Wedge);
+var anno = p1.add(pv.Wedge);
 var bar = p2.add(pv.Bar);
 
-// annotate the data with the line they belong to
-function data_line(data, max_size) {
-    var line = 0;
-    for(var i = 0; i < data.length; ++i) {
-        if(data[i].end > max_size) {
-            ++line;
-            data[i].line = line;
-            max_size += max_size;
-        } else {
-            data[i].line = line;
-        }
-    }
-}
-
 function reload() {
+    //globals
+
     p2
         .width(width + margin)
         .height(lines * (margin + barsize))
         .top(width + margin);
 
-
-    //globals
     width = r*2;
     max = pv.max(data, function(d) { return d.end; } );
 
@@ -67,7 +54,6 @@ function reload() {
 
     // scales
     ws = pv.Scale.linear(0, max).range(0, 2 * Math.PI);
-
     bar_scale = pv.Scale.linear(0, max).range(0, width*lines)
     var line_tmp = 0;
     var break_point = 0;
@@ -80,16 +66,17 @@ function reload() {
         data[i].break_point = break_point;
     }
 
-    for(var i = 0; i < data.length; ++i) {
-        console.log(data[i].line + " " + data[i].name);
-    }
+    console.log(pv.min(annotations) + " " + pv.median(annotations) + " " + pv.max(annotations));
+    heat_scale = pv.Scale.linear(pv.min(annotations), pv.median(annotations), pv.max(annotations))
+        .range('red', 'yellow', 'green');
 
+    // wedges //
     wedge
         .data(data)
         .top(r)
         .left(r)
         .strokeStyle("white")
-        .lineWidth(1)
+        .lineWidth(0)
         .outerRadius(function(d) {
     	    if(d.strand == "-") { return (r - shift); }
     	    else { return (r); }
@@ -103,6 +90,17 @@ function reload() {
         .anchor("center").add(pv.Label)
         .text(function(d) { if(!d.isSmall) return d.name; else return ""; })
         .textAngle(function(d) { return Math.PI/2 + ws(d.start + Math.abs((d.start - d.end) / 2)); } );
+
+    anno
+        .data(annotations)
+        .top(r)
+        .left(r)
+        .lineWidth(0)
+        .outerRadius(function(d) { return r - shift - barsize; })
+        .innerRadius(function(d) { return r - shift - barsize - 10; })
+        .startAngle(function(d) { return ws(this.index); })
+        .angle(function(d) { return ws(1); })
+        .fillStyle(heat_scale);
 
     // bars //
     bar

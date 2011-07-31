@@ -1,9 +1,10 @@
-function handle(evt) {
+function handle(evt, parser) {
     var reader = new FileReader();
     var file = evt.files[0];
     console.log("handling: " + file.name);
     reader.onloadstart = function() { console.log("starting"); }
-    reader.onload = function(e) { parseBED(e.target.result); console.log("load end"); };
+    reader.onload = function(e) { parser(e.target.result); console.log("load end");
+                                  reload(); vis.render(); };
     reader.readAsText(file);
 }
 
@@ -15,7 +16,8 @@ function parseBED(bed_string) {
         lines.pop();
     }
     console.log("parsing: " + lines.length + " lines");
-    var arr = new Array();
+
+    data = new Array();
     for(var i = 0; i < lines.length; ++i) {
         var elems = lines[i].split("\t");
         //sucks but hey
@@ -27,12 +29,20 @@ function parseBED(bed_string) {
         obj.name = elems[3];
         obj.foo = elems[4];
         obj.strand = elems[5];
-        arr.push(obj);
+        data.push(obj);
     }
-    
-    data = arr;
-    console.log("parsed genes: " + arr.length);
-    console.log(data[0]);
-    reload();
-    vis.render();
+}
+
+function parseData(data) {  
+    console.log("parsing");
+    //windows/unix line endings
+    var lines = data.split(/\r\n|\r|\n/);
+    if(lines[lines.length - 1] == "") {
+        lines.pop();
+    }
+
+    console.log("parsing: " + lines.length + " lines");
+
+    annotations = new Array();
+    lines.forEach(function(d) { annotations.push(parseFloat(d)); });
 }

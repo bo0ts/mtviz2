@@ -13,8 +13,8 @@
       <ul id="jsddm">
         <li><a href="#" onclick="hide(this);">Files</a>
           <ul>
-            <li>BED File<input type="file" id="input" onchange="handle(this)"></li>
-            <li>Annotations</li>
+            <li>BED File<input type="file" id="input" onchange="handle(this, parseBED)"></li>
+            <li>Annotations<input type="file" id="input" onchange="handle(this, parseData)"></li>
           </ul>
         </li>
         <li><a href="#" onclick="hide(this);">Bars</a>
@@ -31,6 +31,13 @@
             <li>Line number
               <input type="range" min="1"  max="5" value="1" name="lines" onchange="set_g_name(this.name, this.value);" />
             </li>
+          </ul>
+        </li>
+        <li><a href="#" onclick="hide(this);">Annotation</a>
+          <ul>
+            <li>Enable</li>
+            <li>Offset</li>
+            <li>Size</li>
           </ul>
         </li>
       </ul>
