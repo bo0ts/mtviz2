@@ -11,7 +11,7 @@ ws, bar_scale, heat_scale;
 // setup panels and sizes
 // root, "fullscreen"
 var vis = new pv.Panel()
-    .widthn(1440)
+    .width(1440)
     .height(990);
 
 var p1 = vis.add(pv.Panel)
@@ -24,12 +24,13 @@ var p2 = vis.add(pv.Panel)
     .top(width + margin);
 
 var wedge = p1.add(pv.Wedge);
+var circle = p1.add(pv.Wedge);
+var ticks_w = p1.add(pv.Wedge);
 var anno = p1.add(pv.Wedge);
 var bar = p2.add(pv.Bar);
 
 function reload() {
     //globals
-
     p2
         .width(width + margin)
         .height(lines * (margin + barsize))
@@ -47,10 +48,13 @@ function reload() {
             data[i].isSmall = true;
         }
     }
+
     //all data points that require ticks
     var ticks = new Array();
-    for(var i = 0; i < data.length; ++i) { ticks.push(data[i].start, data[i].end); }
-    ticks = ticks.unique();
+    for(var i = 0; i < data.length; ++i) { 
+        ticks.push({ pos: data[i].start, strand: data[i].strand });
+        ticks.push({ pos: data[i].end, strand: data[i].strand }); 
+    }
 
     // scales
     ws = pv.Scale.linear(0, max).range(0, 2 * Math.PI);
@@ -70,6 +74,18 @@ function reload() {
     heat_scale = pv.Scale.linear(pv.min(annotations), pv.median(annotations), pv.max(annotations))
         .range('red', 'yellow', 'green');
 
+    // full circle //
+    circle
+        .data([1])
+        .top(r)
+        .left(r)
+        .strokeStyle("black")
+        .lineWidth(1)
+        .outerRadius(function(d) { return r - barsize/2 - shift/2; })
+        .innerRadius(function(d) { return r - barsize/2 - shift/2; })
+        .startAngle(0)
+        .angle(Math.PI * 2);
+
     // wedges //
     wedge
         .data(data)
@@ -82,7 +98,7 @@ function reload() {
     	    else { return (r); }
         })
         .innerRadius(function(d) {
-	    if(d.strand == "-") { return (r - barsize - shift); }
+            if(d.strand == "-") { return (r - barsize - shift); }
     	    else { return (r - barsize); }
         })
         .startAngle(function(d) { return ws(d.start); })
@@ -91,6 +107,23 @@ function reload() {
         .text(function(d) { if(!d.isSmall) return d.name; else return ""; })
         .textAngle(function(d) { return Math.PI/2 + ws(d.start + Math.abs((d.start - d.end) / 2)); } );
 
+    ticks_w
+        .data(ticks)
+        .top(r)
+        .left(r)
+        .strokeStyle("black")
+        .lineWidth(1)
+        .outerRadius(function(d)  {
+    	    if(d.strand == "-") { return (r - barsize/2 - 10  - shift/2); }
+    	    else { return (r - barsize/2 + 10 - shift/2); }
+        })
+        .innerRadius(function(d) {
+            if(d.strand == "-") { return (r - barsize/2 - shift/2); }
+    	    else { return (r - barsize/2 - shift/2); }
+        })
+        .startAngle(function(d) { return ws(d.pos); })
+        .angle(0);
+    
     anno
         .data(annotations)
         .top(r)
