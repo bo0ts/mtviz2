@@ -8,36 +8,45 @@ shift = 0,
 max, data = mt2, annotations = new Array(), smalls = new Array(),
 ws, bar_scale, heat_scale;
 
-// setup panels and sizes
-// root, "fullscreen"
-var vis = new pv.Panel()
-    .width(1440)
-    .height(990);
+var vis, p1, p2, wedge, circle, ticks_w, anno, bar, small_layout;
 
-var p1 = vis.add(pv.Panel)
-    .width(width + margin)
-    .height(width + margin);
+function init() {
+    vis = new pv.Panel()
+        .width(width + margin)
+        .height(width + margin + (lines * (margin + barsize)));
 
-var p2 = vis.add(pv.Panel)
-    .width(width + margin)
-    .height(lines * (margin + barsize))
-    .top(width + margin);
+    p1 = vis.add(pv.Panel)
+        .width(width + margin)
+        .height(width + margin);
 
-var wedge = p1.add(pv.Wedge);
-var circle = p1.add(pv.Wedge);
-var ticks_w = p1.add(pv.Wedge);
-var anno = p1.add(pv.Wedge);
-var bar = p2.add(pv.Bar);
+    p2 = vis.add(pv.Panel)
+        .width(width + margin)
+        .height(lines * (margin + barsize))
+        .top(width + margin);
+
+    circle = p1.add(pv.Wedge);
+    wedge = p1.add(pv.Wedge);
+    ticks_w = p1.add(pv.Wedge);
+    anno = p1.add(pv.Wedge);
+    bar = p2.add(pv.Bar);
+}
 
 function reload() {
     //globals
+    width = r*2;
+    vis
+        .width(width + margin)
+        .height(width + margin + (lines * (margin + barsize)));
+    
     p2
         .width(width + margin)
         .height(lines * (margin + barsize))
         .top(width + margin);
 
-    width = r*2;
     max = pv.max(data, function(d) { return d.end; } );
+    // scales
+    ws = pv.Scale.linear(0, max).range(0, 2 * Math.PI);
+    bar_scale = pv.Scale.linear(0, max).range(0, width*lines)
 
     var smalls = new Array();
     //strip down trn sequence names and mark the small
@@ -56,9 +65,6 @@ function reload() {
         ticks.push({ pos: data[i].end, strand: data[i].strand }); 
     }
 
-    // scales
-    ws = pv.Scale.linear(0, max).range(0, 2 * Math.PI);
-    bar_scale = pv.Scale.linear(0, max).range(0, width*lines)
     var line_tmp = 0;
     var break_point = 0;
     for(var i = 0; i < data.length; ++i) {

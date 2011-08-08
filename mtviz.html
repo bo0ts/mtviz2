@@ -5,10 +5,10 @@
     <script type="text/javascript" src="data.js"></script>
     <script type="text/javascript" src="utility.js"></script>
     <script type="text/javascript" src="parsers.js"></script>
-    <script type="text/javascript" src="vis.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css" />
+</script>
   </head>
-    <body>
+    <body onload="init()">
       <div id="head">
       <ul id="jsddm">
         <li><a href="#" onclick="hide(this);">Files</a>
@@ -50,12 +50,7 @@
       </div>
       
       <div id="center">
-        <center>
-        <script type="text/javascript">
-          reload();
-          vis.render();
-        </script>
-        <center>
+          <script type="text/javascript" src="vis.js"></script>
       </div>
 </body>
 </html>
