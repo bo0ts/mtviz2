@@ -12,6 +12,7 @@ var vis, p1, p2, wedge, circle, ticks_w, anno, bar, small_layout;
 
 function init() {
     vis = new pv.Panel()
+        .canvas('fig')
         .width(width + margin)
         .height(width + margin + (lines * (margin + barsize)));
 

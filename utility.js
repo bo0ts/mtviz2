@@ -7,9 +7,11 @@ function hide(e) {
     if(!ul[0].style.visibility) ul[0].style.visibility = "hidden";
     
     if(ul[0].style.visibility != "hidden") {
-        ul[0].style.visibility = "hidden"; 
+        ul[0].style.visibility = "hidden";
+        ul[0].style.display = "none"; 
     } else {
-        ul[0].style.visibility = "visible"; 
+        ul[0].style.visibility = "visible";
+        ul[0].style.display = "inline"; 
     }
 }
 

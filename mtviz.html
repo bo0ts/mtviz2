@@ -3,54 +3,56 @@
     <title>mtviz2</title>
     <script type="text/javascript" src="protovis-r3.2.js"></script>
     <script type="text/javascript" src="data.js"></script>
-    <script type="text/javascript" src="utility.js"></script>
     <script type="text/javascript" src="parsers.js"></script>
+    <script type="text/javascript" src="utility.js"></script>
+    <script type="text/javascript" src="vis.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css" />
-</script>
   </head>
-    <body onload="init()">
-      <div id="head">
-      <ul id="jsddm">
-        <li><a href="#" onclick="hide(this);">Files</a>
-          <ul>
-            <li>BED File<input type="file" id="input" onchange="handle(this, parseBED)"></li>
-            <li>Annotations<input type="file" id="input" onchange="handle(this, parseData)"></li>
-          </ul>
-        </li>
-        <li><a href="#" onclick="hide(this);">Bars</a>
-          <ul>
-            <li>Barsize
-              <input type="range" min="10" max="100" value="30" name="barsize" onchange="set_g_name(this.name, this.value);" />
-            </li>
-            <li>Radius/Width 
-              <input type="range" style="align: right" min="200" max="400" name="r" onchange="set_g_name(this.name, this.value);" />
-            </li>
-            <li>Shift
-              <input type="range" min="0"  max="100" value="0" name="shift" onchange="set_g_name(this.name, this.value);" />
-            </li>
-            <li>Line number
-              <input type="range" min="1"  max="5" value="1" name="lines" onchange="set_g_name(this.name, this.value);" />
-            </li>
-          </ul>
-        </li>
-        <li><a href="#" onclick="hide(this);">Annotation</a>
-          <ul>
-            <li>Enable</li>
-            <li>Offset</li>
-            <li>Size</li>
-          </ul>
-        </li>
-        <li><a href="#" onclick="hide(this);">Color and Border</a>
-          <ul>
-            <li>Borderstyle (select ticks/full border/none/whitespace)</li>
-            <li>Color (select print full)</li>
-          </ul>
-        </li>
-      </ul>
-      </div>
-      
-      <div id="center">
-          <script type="text/javascript" src="vis.js"></script>
-      </div>
-</body>
+  <body onload="init()">
+
+    <ul id="jsddm">
+      <li><a href="#" onclick="hide(this);">Files</a>
+        <ul>
+          <li>BED File<input type="file" id="input" onchange="handle(this, parseBED)"></li>
+          <li>Annotations<input type="file" id="input" onchange="handle(this, parseData)"></li>
+        </ul>
+      </li>
+      <li><a href="#" onclick="hide(this);">Bars</a>
+        <ul>
+          <li>Barsize
+            <input type="range" min="10" max="100" value="30" name="barsize" onchange="set_g_name(this.name, this.value);" />
+          </li>
+          <li>Radius/Width
+            <input type="range" style="align: right" min="200" max="400" name="r" onchange="set_g_name(this.name, this.value);" />
+          </li>
+          <li>Shift
+            <input type="range" min="0"  max="100" value="0" name="shift" onchange="set_g_name(this.name, this.value);" />
+          </li>
+          <li>Line number
+            <input type="range" min="1"  max="5" value="1" name="lines" onchange="set_g_name(this.name, this.value);" />
+          </li>
+        </ul>
+      </li>
+      <li><a href="#" onclick="hide(this);">Annotation</a>
+        <ul>
+          <li>Enable</li>
+          <li>Offset</li>
+          <li>Size</li>
+        </ul>
+      </li>
+      <li><a href="#" onclick="hide(this);">Color and Border</a>
+        <ul>
+          <li>Borderstyle (select ticks/full border/none/whitespace)</li>
+          <li>Color (select print full)</li>
+        </ul>
+      </li>
+    </ul>
+    
+    <div id="vis">
+      <center>
+      <div id="fig"></div>
+      <center>
+    </div>
+
+  </body>
 </html>
