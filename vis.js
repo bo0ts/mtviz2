@@ -4,141 +4,121 @@ var root = new pv.Panel()
 
 var conf = {
     width: 600,
+    margin: 10,
     barsize: 30,
     shift: 0,
     lines: 1,
+    circle: true,
     font_family: "\"Verdana\"",
-    font_size: "10px"
+    font_size: "10px",
+    enableTicks: true,
+
+    update: function(name, value) {
+        if(name == "font_family") {
+            //requote the string...
+            this[name] = "\"".concat(value, "\"");
+        } else if(name == "width") {
+            // width changes require adaption of the root panel
+            root.width(value).height(value);
+            this[name] = value;
+        } else {
+            this[name] = value;
+        }
+
+        this.observer.notify(this);
+        root.render();
+    }
 };
 
-function switch_mode(mode) {
-    // remove the old svg
-    var fig = document.getElementById("fig");
-    while (fig.hasChildNodes()) {
-        fig.removeChild(fig.lastChild);
-    }
-
-    // reset the panel
-    root = new pv.Panel()
-        .width(conf.width)
-        .height(conf.width)
-        .canvas('fig');
-    
-    // update the reference in the config
-    conf.panel = root;
-
-    if(mode == "ring") {
-        vis = new WedgeVis(root);
-        vis.data = data;
-        vis.compute(conf);
-        root.render();
-    }
-    
-    if(mode == "line") {
-        vis = new LineVis(root);
-        vis.data = data;
-        vis.compute(conf);
-        root.render();
-    }
-}
-
-function update(name, value) {
-    conf[name] = value;
-    if(vis) {
-        vis.compute(conf);
-    }
-    root.render();
-}
-
-function WedgeVis(panel) {
-    this.wedge = panel.add(pv.Wedge);
+function WedgeVis(panel, data) {
+    // the ordering is important for the overdraw
     this.circle = panel.add(pv.Wedge);
+    this.wedge = panel.add(pv.Wedge);
     this.ticks = panel.add(pv.Wedge);
     this.anno = panel.add(pv.Wedge);
-    this.enableCircle(true);
-    this.ticksOn = true;
-}
-
-WedgeVis.prototype.enableCircle = function(sw) {
-    if(sw)
-        this.circle.data([0]);
-    else
-        this.circle.data([]);
-};
-
-WedgeVis.prototype.compute = function(conf) {
-    var max = pv.max(this.data, function(d) { return d.end; } );
-    var wedge_scale = pv.Scale.linear(0, max).range(0, 2 * Math.PI);
-
-    // closure tricks
-    var me = this;
-    var radius = conf.width / 2;
-
-    var smalls = new Array();
+    this.data = data;
+    this.labels1 = this.wedge.anchor("center").add(pv.Label);
+    // those remains constant with the data
+    this.max = pv.max(this.data, function(d) { return d.end; } );
+    this.wedge_scale = pv.Scale.linear(0, this.max).range(0, 2 * Math.PI);
+    
+    this.small_data = new Array();
     //strip down trn sequence names and mark the small
     for(var i in this.data) {
         if(this.data[i].name.indexOf("trn") == 0) {
-	    smalls.push(this.data[i]);
+	    this.small_data.push(this.data[i]);
 	    this.data[i].name = this.data[i].name.substr(3, this.data[i].name.substr.length);
             this.data[i].isSmall = true;
         }
     }
 
-    var ticks_d = null;
-    if(this.ticksOn) {
-        ticks_d = new Array();
-        for(var i = 0; i < this.data.length; ++i) { 
-            ticks_d.push({ pos: this.data[i].start, strand: this.data[i].strand });
-            ticks_d.push({ pos: this.data[i].end, strand: this.data[i].strand }); 
-        }
+    ticks_d = new Array();
+    for(var i = 0; i < this.data.length; ++i) { 
+        ticks_d.push({ pos: this.data[i].start, strand: this.data[i].strand });
+        ticks_d.push({ pos: this.data[i].end, strand: this.data[i].strand }); 
     }
-    
+}
+
+WedgeVis.prototype.notify = function(conf) {
+    // set the radius in the config
+    conf.radius = conf.width / 2;
+    console.log(conf.font_family);
+
+    // closure trick
+    var me = this;
+
     // full circle
     this.circle
         .data([0])
-        .top(radius).left(radius).strokeStyle("black").lineWidth(1)
-        .outerRadius(radius - conf.barsize/2 - conf.shift/2)
-        .innerRadius(radius - conf.barsize/2 - conf.shift/2)
+        .top(conf.radius).left(conf.radius).strokeStyle("black").lineWidth(1)
+        .outerRadius(conf.radius - conf.barsize/2 - conf.shift/2)
+        .innerRadius(conf.radius - conf.barsize/2 - conf.shift/2)
         .startAngle(0).angle(Math.PI * 2);
 
     this.wedge
         .data(this.data)
-        .top(radius)
-        .left(radius)
+        .top(conf.radius)
+        .left(conf.radius)
         .strokeStyle("white")
         .lineWidth(0)
         .outerRadius(function(d) {
-    	    if(d.strand == "-") { return (radius - conf.shift); }
-    	    else { return (radius); }
+    	    if(d.strand == "-") { return (conf.radius - conf.shift); }
+    	    else { return (conf.radius); }
         })
         .innerRadius(function(d) {
-            if(d.strand == "-") { return (radius - conf.barsize - conf.shift); }
-    	    else { return (radius - conf.barsize); }
+            if(d.strand == "-") { return (conf.radius - conf.barsize - conf.shift); }
+    	    else { return (conf.radius - conf.barsize); }
         })
-        .startAngle(function(d) { return wedge_scale(d.start); })
-        .angle(function(d) { return wedge_scale(d.end) - wedge_scale(d.start); })
-        .anchor("center").add(pv.Label)
+        .startAngle(function(d) { return me.wedge_scale(d.start); })
+        .angle(function(d) { return me.wedge_scale(d.end) - me.wedge_scale(d.start); });
+
+    this.small_data
+
+    this.labels1
         .font(conf.font_size + conf.font_family)
         .text(function(d) { if(!d.isSmall) return d.name; else return ""; })
-        .textAngle(function(d) { return Math.PI/2 + wedge_scale(d.start + Math.abs((d.start - d.end) / 2)); } );
+        .textAngle(function(d) { return Math.PI/2 + me.wedge_scale(d.start + Math.abs((d.start - d.end) / 2)); } );
 
-    if(ticks_d) {
-        this.ticks
-            .data(ticks_d)
-            .top(radius)
-            .left(radius)
-            .strokeStyle("black")
-            .lineWidth(1)
-            .outerRadius(function(d)  {
-    	        if(d.strand == "-") { return (radius - conf.barsize/2 - 10  - conf.shift/2); }
-    	        else { return (radius - conf.barsize/2 + 10 - conf.shift/2); }
-            })
-            .innerRadius(function(d) {
-                if(d.strand == "-") { return (radius - conf.barsize/2 - conf.shift/2); }
-    	        else { return (radius - conf.barsize/2 - conf.shift/2); }
-            })
-            .startAngle(function(d) { return wedge_scale(d.pos); })
-            .angle(0);
+    this.ticks
+        .top(conf.radius)
+        .left(conf.radius)
+        .strokeStyle("black")
+        .lineWidth(1)
+        .outerRadius(function(d)  {
+    	    if(d.strand == "-") { return (conf.radius - conf.barsize/2 - 10  - conf.shift/2); }
+    	    else { return (conf.radius - conf.barsize/2 + 10 - conf.shift/2); }
+        })
+        .innerRadius(function(d) {
+            if(d.strand == "-") { return (conf.radius - conf.barsize/2 - conf.shift/2); }
+    	    else { return (conf.radius - conf.barsize/2 - conf.shift/2); }
+        })
+        .startAngle(function(d) { return me.wedge_scale(d.pos); })
+        .angle(0);
+
+    if(conf.enableTicks) {
+        this.ticks.data(ticks_d);
+    } else {
+        this.ticks.data([]);
     }
 
     // // if annotations are available, render them as a heat scale
@@ -158,23 +138,59 @@ WedgeVis.prototype.compute = function(conf) {
             .lineWidth(0)
             .outerRadius(function(d) { return this.radius - this.shift - this.barsize; })
             .innerRadius(function(d) { return this.radius - shift - this.barsize - 10; })
-            .startAngle(function(d) { return wedge_scale(this.index); })
+            .startAngle(function(d) { return me.wedge_scale(this.index); })
             .angle(function(d) { return ws(1); })
             .fillStyle(heat_scale);
     }
 };
 
-//     bar_scale = pv.Scale.linear(0, max).range(0, width*lines)
-//     // bars //
-//     bar
-//         .data(data)
-//         .left(function(d) { return bar_scale(d.start) - bar_scale(d.break_point); })
-//         .width(function(d) { return bar_scale(d.end) - bar_scale(d.start); })
-//         .bottom(function(d) { return (barsize+margin) * (lines - d.line - 1); })
-//         .height(30)
-//         .lineWidth(1)
-//         .strokeStyle("white")
-//         .anchor("center").add(pv.Label)
-//         .text(function(d) { if(!d.isSmall) return d.name; else return ""; });
-// }
+function BarVis(panel, data) {
+    this.max = pv.max(data, function(d) { return d.end; } );
 
+    this.data = data;
+    this.bars = panel.add(pv.Bar);
+    this.label = this.bars.anchor("center").add(pv.Label);
+
+    this.small_data = new Array();
+    //strip down trn sequence names and mark the small
+    for(var i in this.data) {
+        if(this.data[i].name.indexOf("trn") == 0) {
+	    this.small_data.push(this.data[i]);
+	    this.data[i].name = this.data[i].name.substr(3, this.data[i].name.substr.length);
+            this.data[i].isSmall = true;
+        }
+    }
+}
+
+BarVis.prototype.notify = function(conf) {
+    var me = this,
+    bar_scale = pv.Scale.linear(0, this.max).range(0, conf.width*conf.lines);
+
+    var line_tmp = 0;
+    var break_point = 0;
+    for(var i = 0; i < this.data.length; ++i) {
+        delete this.data[i].breakpoint;
+    }
+
+    for(var i = 0; i < this.data.length; ++i) {
+        if(bar_scale(this.data[i].end) > (conf.width * (line_tmp + 1))) {
+            ++line_tmp;
+            break_point = this.data[i-1].end;
+        }
+        this.data[i].line = line_tmp;
+        this.data[i].break_point = break_point;
+    }
+
+    this.bars
+        .data(this.data)
+        .left(function(d) { return bar_scale(d.start) - bar_scale(d.break_point); })
+        .width(function(d) { return bar_scale(d.end) - bar_scale(d.start); })
+        .top(function(d) { return (conf.barsize+conf.margin) * (conf.lines - d.line - 1); })
+        .height(conf.barsize)
+        .lineWidth(1)
+        .strokeStyle("white");
+
+    this.label
+        .font(conf.font_size + conf.font_family)
+        .text(function(d) { if(!d.isSmall) return d.name; else return ""; });
+};

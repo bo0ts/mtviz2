@@ -1,3 +1,48 @@
+function switch_mode(mode) {
+    // remove the old svg
+    var fig = document.getElementById("fig");
+    while (fig.hasChildNodes()) {
+        fig.removeChild(fig.lastChild);
+    }
+
+    // reset the panel
+    root = new pv.Panel()
+        .width(conf.width)
+        .height(conf.width)
+        .canvas('fig');
+    
+    // update the reference in the config
+    conf.panel = root;
+
+    if(mode == "ring") {
+        vis = new WedgeVis(root, data);
+    }
+    
+    if(mode == "bar") {
+        vis = new BarVis(root, data);
+    }
+
+    conf.observer = vis;
+    vis.notify(conf);
+    root.render();
+}
+
+function exportSVG() {
+    var builder;
+    // fragile mozilla/chrome hack
+    if(window.MozBlobBuilder)
+        builder = new window.MozBlobBuilder();
+    else {
+        builder = new window.WebKitBlobBuilder();
+    }
+    
+    // look for the svg and bang the string repl in builder
+    var fig = document.getElementById("fig");
+
+    builder.append(fig.innerHTML);
+    // from saveAs.js
+    saveAs(builder.getBlob(), 'vis.svg');
+}
 
 ///hide the inner ul
 function hide(e) {
@@ -14,17 +59,3 @@ function hide(e) {
         ul[0].style.display = "inline"; 
     }
 }
-
-// Array.prototype.unique = function() {
-//     var a = [];
-//     var l = this.length;
-//     for(var i=0; i<l; i++) {
-// 	for(var j=i+1; j<l; j++) {
-//             // If this[i] is found later in the array
-//             if (this[i] === this[j])
-// 		j = ++i;
-// 	}
-// 	a.push(this[i]);
-//     }
-//     return a;
-// };

@@ -6,6 +6,7 @@
     <script type="text/javascript" src="parsers.js"></script>
     <script type="text/javascript" src="utility.js"></script>
     <script type="text/javascript" src="vis.js"></script>
+    <script type="text/javascript" src="SaveAs.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css" />
   </head>
   <body>
@@ -13,7 +14,7 @@
       <li><a href="javascript:void(0)" onclick="hide(this);">Mode</a>
         <ul>
           <li><a href="javascript:void(0)" onclick="switch_mode(&quot;ring&quot;)">Ring</a></li>
-          <li><a href="javascript:void(0)" onclick="switch_mode(&quot;lines&quot;)">Lines</a></li>
+          <li><a href="javascript:void(0)" onclick="switch_mode(&quot;bar&quot;)">Bar</a></li>
           <li>BED File<input type="file" id="input" onchange="handle(this, parseBED)"></li>
         </ul>
       </li>
@@ -28,49 +29,62 @@
       <li><a href="javascript:void(0)" onclick="hide(this);">Bars</a>
         <ul>
           <li>Barsize
-            <input type="range" min="10" max="100" value="30" name="barsize" 
-                   onchange="set_g_name(this.name, this.value);" />
+            <input type="range" min="10" max="100" name="barsize" value="30"
+                   onchange="conf.update(this.name, this.value);" />
           </li>
-          <li>Radius/Width
-            <input type="range" style="align: right" min="200" max="400" name="r" 
-                   onchange="set_g_name(this.name, this.value);" />
+          <li>Width
+            <input type="range" min="200" max="1000" name="width" value="600"
+                   onchange="conf.update(this.name, this.value);" />
           </li>
           <li>Shift
             <input type="range" min="0"  max="100" value="0" name="shift" 
-                   onchange="set_g_name(this.name, this.value);" />
+                   onchange="conf.update(this.name, this.value);" />
           </li>
           <li>Line number
-            <input type="range" min="1"  max="5" value="1" name="lines" 
-                   onchange="set_g_name(this.name, this.value);" />
+            <input type="range" omin="1"  max="5" value="1" name="lines" 
+                   onchange="conf.update(this.name, this.value);" />
           </li>
         </ul>
       </li>
       <li><a href="javascript:void(0)" onclick="hide(this);">Color and Border</a>
         <ul>
-          <li>Borderstyle (select ticks/full border/none/whitespace)</li>
-          <li>Color (select print full)</li>
+          <li>Borderstyle
+            <select name="borderstyle" onchange="alert(this.value); conf.update(this.name, this.value);" >
+              <option>Ticks</option>
+              <option>Full Border</option>
+              <option>None</option>
+              <option>Whitespace</option>
+            </select>
+          </li>
+          <li> Color
+            <select name="color" onchange="" >
+              <option>Full</option>
+              <option>Black and White</option>
+            </select>
         </ul>
       </li>
       <li><a href="javascript:void(0)" onclick="hide(this);">Font</a>
         <ul>
           <li>Size
-            <select name="font_size" onchange="" >
+            <select name="font_size" onchange="conf.update(this.name, this.value)">
               <option>10</option>
               <option>12</option>
               <option>14</option>
               <option>16</option>
               <option>18</option>
             </select>
-          <li><select name="font_family" onchange="" >
-              <option>Times New Roman</option>
-              <option>Georgia</option>
-              <option>Arial</option>
-              <option>Verdana</option>
-              <option>Courier New</option>
-              <option>Lucida Console</option>
+          <li>
+            <select name="font_family" onchange="conf.update(this.name, this.value)">
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="Georgia">Georgia</option>
+              <option value="Arial">Arial</option>
+              <option value="Verdana">Verdana</option>
+              <option value="Courier New">Courier New</option>
+              <option value="Lucida Console">Lucida Console</option>
             </select>
         </ul>
       </li>
+      <li><a href="javascript:void(0)" onclick="exportSVG()">Export SVG</a></li>
     </ul>
 
     <div id="vis">
