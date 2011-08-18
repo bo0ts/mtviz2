@@ -8,51 +8,75 @@
     <script type="text/javascript" src="vis.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css" />
   </head>
-  <body onload="init()">
-
+  <body>
     <ul id="jsddm">
-      <li><a href="#" onclick="hide(this);">Files</a>
+      <li><a href="javascript:void(0)" onclick="hide(this);">Mode</a>
         <ul>
+          <li><a href="javascript:void(0)" onclick="switch_mode(&quot;ring&quot;)">Ring</a></li>
+          <li><a href="javascript:void(0)" onclick="switch_mode(&quot;lines&quot;)">Lines</a></li>
           <li>BED File<input type="file" id="input" onchange="handle(this, parseBED)"></li>
+        </ul>
+      </li>
+      <li><a href="javascript:void(0)" onclick="hide(this);">Annotation</a>
+        <ul>
           <li>Annotations<input type="file" id="input" onchange="handle(this, parseData)"></li>
-        </ul>
-      </li>
-      <li><a href="#" onclick="hide(this);">Bars</a>
-        <ul>
-          <li>Barsize
-            <input type="range" min="10" max="100" value="30" name="barsize" onchange="set_g_name(this.name, this.value);" />
-          </li>
-          <li>Radius/Width
-            <input type="range" style="align: right" min="200" max="400" name="r" onchange="set_g_name(this.name, this.value);" />
-          </li>
-          <li>Shift
-            <input type="range" min="0"  max="100" value="0" name="shift" onchange="set_g_name(this.name, this.value);" />
-          </li>
-          <li>Line number
-            <input type="range" min="1"  max="5" value="1" name="lines" onchange="set_g_name(this.name, this.value);" />
-          </li>
-        </ul>
-      </li>
-      <li><a href="#" onclick="hide(this);">Annotation</a>
-        <ul>
           <li>Enable</li>
           <li>Offset</li>
           <li>Size</li>
         </ul>
       </li>
-      <li><a href="#" onclick="hide(this);">Color and Border</a>
+      <li><a href="javascript:void(0)" onclick="hide(this);">Bars</a>
+        <ul>
+          <li>Barsize
+            <input type="range" min="10" max="100" value="30" name="barsize" 
+                   onchange="set_g_name(this.name, this.value);" />
+          </li>
+          <li>Radius/Width
+            <input type="range" style="align: right" min="200" max="400" name="r" 
+                   onchange="set_g_name(this.name, this.value);" />
+          </li>
+          <li>Shift
+            <input type="range" min="0"  max="100" value="0" name="shift" 
+                   onchange="set_g_name(this.name, this.value);" />
+          </li>
+          <li>Line number
+            <input type="range" min="1"  max="5" value="1" name="lines" 
+                   onchange="set_g_name(this.name, this.value);" />
+          </li>
+        </ul>
+      </li>
+      <li><a href="javascript:void(0)" onclick="hide(this);">Color and Border</a>
         <ul>
           <li>Borderstyle (select ticks/full border/none/whitespace)</li>
           <li>Color (select print full)</li>
         </ul>
       </li>
+      <li><a href="javascript:void(0)" onclick="hide(this);">Font</a>
+        <ul>
+          <li>Size
+            <select name="font_size" onchange="" >
+              <option>10</option>
+              <option>12</option>
+              <option>14</option>
+              <option>16</option>
+              <option>18</option>
+            </select>
+          <li><select name="font_family" onchange="" >
+              <option>Times New Roman</option>
+              <option>Georgia</option>
+              <option>Arial</option>
+              <option>Verdana</option>
+              <option>Courier New</option>
+              <option>Lucida Console</option>
+            </select>
+        </ul>
+      </li>
     </ul>
-    
+
     <div id="vis">
       <center>
       <div id="fig"></div>
-      <center>
+      </center>
     </div>
-
   </body>
 </html>

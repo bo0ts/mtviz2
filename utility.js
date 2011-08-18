@@ -28,9 +28,3 @@ function hide(e) {
 //     }
 //     return a;
 // };
-
-function set_g_name(name,e) {
-    window[name] = e;
-    reload();
-    vis.render();
-}
