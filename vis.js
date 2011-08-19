@@ -1,10 +1,12 @@
-var data = mt2, annotations = null, vis = null;
+var data = mt1, annotations = null, vis = null;
 var root = new pv.Panel()
     .canvas('fig');
 
+
+// this is madness
 var conf = {
     width: 600,
-    margin: 10,
+    margin: 30,
     barsize: 30,
     shift: 0,
     lines: 1,
@@ -16,6 +18,23 @@ var conf = {
     strand_ticks: false,
     value_ticks: true,
     markers: new Array(),
+    palette: pv.Colors.category20(),
+    caption_heading: "Zergling",
+    caption_add: "Where are my probes?",
+    caption_pic: "http://wiki.teamliquid.net/starcraft/images2/b/b0/Zergling.gif",
+
+    set_color: function(mode) {
+        // pretty, not
+        if(mode == "full") {
+            this.palette = pv.Colors.category20();
+        } else if(mode == "bw") {
+            this.palette = pv.Scale.linear(0, data.length).range('grey', 'white');
+        } else if(mode == "none") {
+            palette = null;
+        }
+        this.observer.notify(this);
+        root.render();
+    },
 
     add_marker: function(start, end, name) {
         this.markers.push({start: parseInt(start, 10), end: parseInt(end, 10), name: name});
@@ -25,12 +44,12 @@ var conf = {
 
     update: function(name, value) {
         if(name == "font_family") {
-            //requote the string...
+            // requote the string...
             this[name] = "\"".concat(value, "\"");
         } else if(name == "width") {
             // width changes require adaption of the root panel
-            root.width(value + 20).height(value + 20);
-            this[name] = value;
+            root.width(parseInt(value, 10) + 20).height(parseInt(value, 10) + 20);
+            this[name] = parseInt(value, 10);
         } else {
             this[name] = value;
         }
@@ -45,7 +64,7 @@ function WedgeVis(panel, data) {
 
     // the ordering is important for the overdraw
     this.circle = panel.add(pv.Wedge);
-    this.circle.anchor("start").add(pv.Dot).fillStyle("grey");
+    this.circle.anchor("start").add(pv.Dot).shape("triangle").fillStyle("grey");
 
     this.wedge = panel.add(pv.Wedge);
     this.labels1 = this.wedge.anchor("center").add(pv.Label);
@@ -57,6 +76,10 @@ function WedgeVis(panel, data) {
     this.marker_labels = this.markers.anchor("center").add(pv.Label);
 
     this.anno = panel.add(pv.Wedge);
+
+    this.caption_heading = panel.add(pv.Label);
+    this.caption_add = panel.add(pv.Label);
+    this.caption_image = panel.add(pv.Image).url(conf.caption_pic).width(100).height(100);
 
     // those remains constant with the data
     this.max = pv.max(this.data, function(d) { return d.end; } );
@@ -76,7 +99,7 @@ function WedgeVis(panel, data) {
 WedgeVis.prototype.notify = function(conf) {
     // set the radius in the config
     conf.radius = conf.width / 2;
-    conf.center = (conf.width + 20) / 2;
+    conf.center = (conf.width + conf.margin) / 2;
     // XXX hack, we shouldn't access root from here
     // set all common things
     root.top(conf.center).left(conf.center);
@@ -101,6 +124,21 @@ WedgeVis.prototype.notify = function(conf) {
         .lineWidth(1)
         .angle(0);
 
+    this.caption_heading
+        .top(-50)
+        .textAlign("center")
+        .font((parseInt(conf.font_size, 10) + 4) + conf.font_family)
+        .text(conf.caption_heading);
+
+    this.caption_add
+        .top(-40)
+        .textAlign("center")
+        .text(conf.caption_add);
+
+    this.caption_image
+        .top(-30)
+        .left(-50);
+
     if(conf.value_ticks) {
         this.value_ticks
             .data(this.wedge_scale.ticks());
@@ -118,6 +156,7 @@ WedgeVis.prototype.notify = function(conf) {
         .data(this.data)
         .strokeStyle(conf.border_colour)
         .lineWidth(conf.border_size)
+        .fillStyle(function(d) { return conf.palette(this.index); })
         .outerRadius(function(d) {
     	    if(d.strand == "-") { return (conf.radius - conf.shift); }
     	    else { return (conf.radius); }

@@ -4,7 +4,8 @@ function handle(evt, parser) {
     console.log("handling: " + file.name);
     reader.onloadstart = function() { console.log("starting"); }
     reader.onload = function(e) { parser(e.target.result); console.log("load end");
-                                  reload(); vis.render(); };
+                                  // dirty switch_mode
+                                  switch_mode("ring"); };
     reader.readAsText(file);
 }
 

@@ -71,6 +71,7 @@
             <select name="color" onchange="conf.set_color(this.value)">
               <option value="full">Full</option>
               <option value="bw">Black and White</option>
+              <option value="none">None</option>
             </select>
         </ul>
       </li>
@@ -106,6 +107,16 @@
           </form>
           </li>
         </ul>
+      <li><a href="javascript:void(0)" onclick="hide(this);">Caption</a>
+        <ul>
+          <li><input type="text" name="caption_heading" placeholder="Heading"
+                     onchange="conf.update(this.name, this.value)"/>
+          </li>
+          <li><input type="text" name="caption_add" placeholder="Additional"
+                     onchange="conf.update(this.name, this.value)"/>
+          </li>
+        </ul>
+      </li>
       <li><a href="javascript:void(0)" onclick="exportSVG()">Export SVG</a></li>
     </ul>
 

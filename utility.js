@@ -7,9 +7,8 @@ function switch_mode(mode) {
 
     // reset the panel
     root = new pv.Panel()
-        .width(conf.width + 20)
-        .height(conf.width + 20)
-        .def("center", (conf.width + 20) / 2)
+        .width(conf.width + conf.margin)
+        .height(conf.width + conf.margin)
         .canvas('fig');
     
     // update the reference in the config
