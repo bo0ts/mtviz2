@@ -41,25 +41,36 @@
                    onchange="conf.update(this.name, this.value);" />
           </li>
           <li>Line number
-            <input type="range" omin="1"  max="5" value="1" name="lines" 
+            <input type="number" min="1"  max="5" value="1" name="lines" step="1"
                    onchange="conf.update(this.name, this.value);" />
           </li>
         </ul>
       </li>
       <li><a href="javascript:void(0)" onclick="hide(this);">Color and Border</a>
         <ul>
-          <li>Borderstyle
-            <select name="borderstyle" onchange="alert(this.value); conf.update(this.name, this.value);" >
-              <option>Ticks</option>
-              <option>Full Border</option>
-              <option>None</option>
-              <option>Whitespace</option>
+          <li>
+            <input type="checkbox" name="strand_ticks" 
+                   onchange="conf.update(this.name, this.checked);"/>
+            Strand oriented ticks (dropped feature)
+            <br/>
+            <input type="checkbox" name="value_ticks"
+                   onchange="conf.update(this.name, this.checked);" checked/>
+            Value Ticks
+          </li>
+          <li>Bordercolour
+            <select name="border_colour" onchange="conf.update(this.name, this.value);" >
+              <option value="white">White</option>
+              <option value="black">Black</option>
             </select>
           </li>
+          <li>
+            Size: <input name="border_size" type="number" min="0" step="1"
+                         onchange="conf.update(this.name, this.value)"/>
+          </li>
           <li> Color
-            <select name="color" onchange="" >
-              <option>Full</option>
-              <option>Black and White</option>
+            <select name="color" onchange="conf.set_color(this.value)">
+              <option value="full">Full</option>
+              <option value="bw">Black and White</option>
             </select>
         </ul>
       </li>
@@ -84,6 +95,17 @@
             </select>
         </ul>
       </li>
+      <li><a href="javascript:void(0)" onclick="hide(this);">Marker</a>
+        <ul>
+          <li>
+          <form onsubmit="conf.add_marker(this.start.value, this.end.value, this.name.value); return false;">
+            Start: <input name="start" type="number" min="1" value="1" step="1"/> <br/>
+            End: <input name="end" type="number" min="1" value="50" step="1"/> <br />
+            Name: <input type="text" name="name" placeholder="Name"/> <br />
+            <input type="submit" value="Add Marker" />
+          </form>
+          </li>
+        </ul>
       <li><a href="javascript:void(0)" onclick="exportSVG()">Export SVG</a></li>
     </ul>
 

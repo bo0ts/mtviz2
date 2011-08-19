@@ -1,7 +1,7 @@
 #vis
 {
     float: right;
-    width: 85%;
+    width: 75%;
 }  
 
 #fig
@@ -16,7 +16,6 @@
     float: left;
     margin: 0;
     padding: 0;
-    width: 15%;
 }
 
 #jsddm li
@@ -24,7 +23,6 @@
     list-style: none;
     padding: 1;
     font: 12px Tahoma, Arial;
-    width: 150px;
     clear: both;
 }
 
@@ -36,7 +34,8 @@
     text-decoration: none;
     border-right: 1px solid white;
     color: #EAFFED;
-    white-space: nowrap}
+    white-space: nowrap
+}
 
 #jsddm li a:hover
 {	
@@ -57,7 +56,6 @@
 
 #jsddm li ul li
 {	
-    width: auto;
     height: auto;
     background: #A9C251;
     color: #24313C;
