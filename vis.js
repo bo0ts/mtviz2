@@ -17,6 +17,7 @@ var conf = {
     border_colour: "white",
     strand_ticks: false,
     value_ticks: true,
+    line_dist: 20,
     markers: new Array(),
     palette: pv.Colors.category20(),
     caption_heading: "Zergling",
@@ -30,7 +31,10 @@ var conf = {
         } else if(mode == "bw") {
             this.palette = pv.Scale.linear(0, data.length).range('grey', 'white');
         } else if(mode == "none") {
-            palette = null;
+            console.log(mode);
+            this.palette = null;
+        } else if(mode == "blue") {
+            this.palette = function() { return "#1f77b4"; }
         }
         this.observer.notify(this);
         root.render();
@@ -221,6 +225,14 @@ function BarVis(panel, data) {
     this.bars = panel.add(pv.Bar);
     this.label = this.bars.anchor("center").add(pv.Label);
 
+    this.caption_heading = panel.add(pv.Label);
+    this.caption_add = panel.add(pv.Label);
+    this.caption_image = panel.add(pv.Image).url(conf.caption_pic).width(100).height(100);
+
+    this.markers = panel.add(pv.Rule);
+    this.marker_labels = this.markers.anchor("top").add(pv.Label);
+
+
     this.small_data = new Array();
     //strip down trn sequence names and mark the small
     for(var i in this.data) {
@@ -233,6 +245,7 @@ function BarVis(panel, data) {
 }
 
 BarVis.prototype.notify = function(conf) {
+    conf.center = (conf.width + conf.margin) / 2;
     var me = this,
     bar_scale = pv.Scale.linear(0, this.max).range(0, conf.width*conf.lines);
 
@@ -255,10 +268,44 @@ BarVis.prototype.notify = function(conf) {
         .data(this.data)
         .left(function(d) { return bar_scale(d.start) - bar_scale(d.break_point); })
         .width(function(d) { return bar_scale(d.end) - bar_scale(d.start); })
-        .top(function(d) { return (conf.barsize+conf.margin) * (conf.lines - d.line - 1); })
+        .top(function(d) { // spacing for the caption + upper rows
+            return 100 + 50 + (conf.barsize + conf.line_dist) * d.line; })
         .height(conf.barsize)
-        .lineWidth(1)
-        .strokeStyle("white");
+        .lineWidth(conf.border_size)
+        .fillStyle(function(d) { if(conf.palette) return conf.palette(this.index); else return null; })
+        .strokeStyle(conf.border_colour);
+
+    // XXX calculate the break points for the markers
+    this.markers
+        .data(conf.markers)
+        .left(function(d) { return bar_scale(d.start); })
+        .width(function(d) { return bar_scale(d.end) - bar_scale(d.start); })
+        .strokeStyle("black")
+        .top(function(d) { // spacing for the caption + upper rows
+            return 100 + 45; }).anchor("left").add(pv.Dot).size(10);
+
+    this.markers.anchor("right").add(pv.Dot).size(10);
+
+    this.marker_labels
+        .font(conf.font_size + conf.font_family)
+        .text(function(d) { return d.name; });
+
+    this.caption_heading
+        .left(conf.center)
+        .top(15)
+        .textAlign("center")
+        .font((parseInt(conf.font_size, 10) + 4) + conf.font_family)
+        .text(conf.caption_heading);
+
+    this.caption_add
+        .left(conf.center)
+        .top(25)
+        .textAlign("center")
+        .text(conf.caption_add);
+
+    this.caption_image
+        .top(30)
+        .left(conf.center - 50);
 
     this.label
         .font(conf.font_size + conf.font_family)
