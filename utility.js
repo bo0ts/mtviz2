@@ -45,17 +45,21 @@ function exportSVG() {
 }
 
 ///hide the inner ul
-function hide(e) {
+function hide_sub(e) {
     //magic, only do it when we came from li
     e = e.parentNode;
     var ul = e.getElementsByTagName("ul");
-    if(!ul[0].style.visibility) ul[0].style.visibility = "hidden";
-    
-    if(ul[0].style.visibility != "hidden") {
-        ul[0].style.visibility = "hidden";
-        ul[0].style.display = "none"; 
+    hide(ul[0]);
+}
+
+function hide(e) {
+    if(!e.style.visibility) e.style.visibility = "hidden";
+
+    if(e.style.visibility != "hidden") {
+        e.style.visibility = "hidden";
+        e.style.display = "none"; 
     } else {
-        ul[0].style.visibility = "visible";
-        ul[0].style.display = "inline"; 
+        e.style.visibility = "visible";
+        e.style.display = "inline"; 
     }
 }

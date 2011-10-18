@@ -7,18 +7,19 @@
     <script type="text/javascript" src="utility.js"></script>
     <script type="text/javascript" src="vis.js"></script>
     <script type="text/javascript" src="SaveAs.js"></script>
+    <script type="text/javascript" src="html5slider.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css" />
   </head>
   <body>
     <ul id="jsddm">
-      <li><a href="javascript:void(0)" onclick="hide(this);">Mode</a>
+      <li><a href="javascript:void(0)" onclick="hide_sub(this);">Mode</a>
         <ul>
           <li><a href="javascript:void(0)" onclick="switch_mode(&quot;ring&quot;)">Ring</a></li>
           <li><a href="javascript:void(0)" onclick="switch_mode(&quot;bar&quot;)">Bar</a></li>
           <li>BED File<input type="file" id="input" onchange="handle(this, parseBED)"></li>
         </ul>
       </li>
-      <li><a href="javascript:void(0)" onclick="hide(this);">Annotation</a>
+      <li><a href="javascript:void(0)" onclick="hide_sub(this);">Annotation</a>
         <ul>
           <li>Annotations<input type="file" id="input" onchange="handle(this, parseData)"></li>
           <li>Enable</li>
@@ -26,7 +27,7 @@
           <li>Size</li>
         </ul>
       </li>
-      <li><a href="javascript:void(0)" onclick="hide(this);">Bars</a>
+      <li><a href="javascript:void(0)" onclick="hide_sub(this);">Bars</a>
         <ul>
           <li>Barsize
             <input type="range" min="10" max="100" name="barsize" value="30"
@@ -46,13 +47,9 @@
           </li>
         </ul>
       </li>
-      <li><a href="javascript:void(0)" onclick="hide(this);">Color and Border</a>
+      <li><a href="javascript:void(0)" onclick="hide_sub(this);">Color and Border</a>
         <ul>
           <li>
-            <input type="checkbox" name="strand_ticks" 
-                   onchange="conf.update(this.name, this.checked);"/>
-            Strand oriented ticks (dropped feature)
-            <br/>
             <input type="checkbox" name="value_ticks"
                    onchange="conf.update(this.name, this.checked);" checked/>
             Value Ticks
@@ -70,13 +67,13 @@
           <li> Color
             <select name="color" onchange="conf.set_color(this.value)">
               <option value="full">Full</option>
-              <option value="bw">Black and White</option>
+              <option value="bw">Greyscale</option>
               <option value="none">None</option>
               <option value="blue">Just Blue</option>
             </select>
         </ul>
       </li>
-      <li><a href="javascript:void(0)" onclick="hide(this);">Font</a>
+      <li><a href="javascript:void(0)" onclick="hide_sub(this);">Font</a>
         <ul>
           <li>Size
             <select name="font_size" onchange="conf.update(this.name, this.value)">
@@ -97,7 +94,7 @@
             </select>
         </ul>
       </li>
-      <li><a href="javascript:void(0)" onclick="hide(this);">Marker</a>
+      <li><a href="javascript:void(0)" onclick="hide_sub(this);">Marker</a>
         <ul>
           <li>
           <form onsubmit="conf.add_marker(this.start.value, this.end.value, this.name.value); return false;">
@@ -108,7 +105,7 @@
           </form>
           </li>
         </ul>
-      <li><a href="javascript:void(0)" onclick="hide(this);">Caption</a>
+      <li><a href="javascript:void(0)" onclick="hide_sub(this);">Caption</a>
         <ul>
           <li><input type="text" name="caption_heading" placeholder="Heading"
                      onchange="conf.update(this.name, this.value)"/>
@@ -116,15 +113,21 @@
           <li><input type="text" name="caption_add" placeholder="Additional"
                      onchange="conf.update(this.name, this.value)"/>
           </li>
+          <li>Picture height
+            <input type="number" min="0"  value="100" name="caption_pic_height" step="10"
+                   onchange="conf.update(this.name, this.value);" />
+          </li>
+          <li>Picture width
+            <input type="number" min="0"  max="5" value="100" name="caption_pic_width" step="10"
+                   onchange="conf.update(this.name, this.value);" />
+          </li>
         </ul>
       </li>
       <li><a href="javascript:void(0)" onclick="exportSVG()">Export SVG</a></li>
     </ul>
 
     <div id="vis">
-      <center>
       <div id="fig"></div>
-      </center>
     </div>
   </body>
 </html>

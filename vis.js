@@ -1,7 +1,6 @@
-var data = mt1, annotations = null, vis = null;
+var data = mt2, annotations = null, vis = null;
 var root = new pv.Panel()
     .canvas('fig');
-
 
 // this is madness
 var conf = {
@@ -23,6 +22,8 @@ var conf = {
     caption_heading: "Zergling",
     caption_add: "Where are my probes?",
     caption_pic: "http://wiki.teamliquid.net/starcraft/images2/b/b0/Zergling.gif",
+    caption_pic_width: 100,
+    caption_pic_height: 100,
 
     set_color: function(mode) {
         // pretty, not
@@ -32,7 +33,8 @@ var conf = {
             this.palette = pv.Scale.linear(0, data.length).range('grey', 'white');
         } else if(mode == "none") {
             console.log(mode);
-            this.palette = null;
+            this.palette = pv.Scale.linear(0, data.length).range('white', 'white');
+            // this.palette = null;
         } else if(mode == "blue") {
             this.palette = function() { return "#1f77b4"; }
         }
@@ -52,7 +54,7 @@ var conf = {
             this[name] = "\"".concat(value, "\"");
         } else if(name == "width") {
             // width changes require adaption of the root panel
-            root.width(parseInt(value, 10) + 20).height(parseInt(value, 10) + 20);
+            root.width(parseInt(value, 10)).height(parseInt(value, 10));
             this[name] = parseInt(value, 10);
         } else {
             this[name] = value;
@@ -66,7 +68,7 @@ var conf = {
 function WedgeVis(panel, data) {
     this.data = data;
 
-    // the ordering is important for the overdraw
+    // the ordering of the "adds" is important for the overdraw
     this.circle = panel.add(pv.Wedge);
     this.circle.anchor("start").add(pv.Dot).shape("triangle").fillStyle("grey");
 
@@ -83,13 +85,15 @@ function WedgeVis(panel, data) {
 
     this.caption_heading = panel.add(pv.Label);
     this.caption_add = panel.add(pv.Label);
-    this.caption_image = panel.add(pv.Image).url(conf.caption_pic).width(100).height(100);
+    this.caption_image = panel.add(pv.Image).url(conf.caption_pic)
+        .width(conf.caption_pic_width).height(conf.caption_pic_height);
 
     // those remains constant with the data
     this.max = pv.max(this.data, function(d) { return d.end; } );
     this.wedge_scale = pv.Scale.linear(0, this.max).range(0, 2 * Math.PI);
     
     this.small_data = new Array();
+
     //strip down trn sequence names and mark the small
     for(var i in this.data) {
         if(this.data[i].name.indexOf("trn") == 0) {
@@ -141,7 +145,9 @@ WedgeVis.prototype.notify = function(conf) {
 
     this.caption_image
         .top(-30)
-        .left(-50);
+        .left(-50)
+        .width(conf.caption_pic_width)
+        .height(conf.caption_pic_height);
 
     if(conf.value_ticks) {
         this.value_ticks
@@ -227,7 +233,8 @@ function BarVis(panel, data) {
 
     this.caption_heading = panel.add(pv.Label);
     this.caption_add = panel.add(pv.Label);
-    this.caption_image = panel.add(pv.Image).url(conf.caption_pic).width(100).height(100);
+    this.caption_image = panel.add(pv.Image).url(conf.caption_pic)
+        .width(conf.caption_pic_width).height(conf.caption_pic_height);
 
     this.markers = panel.add(pv.Rule);
     this.marker_labels = this.markers.anchor("top").add(pv.Label);
@@ -269,7 +276,8 @@ BarVis.prototype.notify = function(conf) {
         .left(function(d) { return bar_scale(d.start) - bar_scale(d.break_point); })
         .width(function(d) { return bar_scale(d.end) - bar_scale(d.start); })
         .top(function(d) { // spacing for the caption + upper rows
-            return 100 + 50 + (conf.barsize + conf.line_dist) * d.line; })
+            // parseInt yeah
+            return parseInt(conf.caption_pic_height, 10) + 50 + (conf.barsize + conf.line_dist) * d.line; })
         .height(conf.barsize)
         .lineWidth(conf.border_size)
         .fillStyle(function(d) { if(conf.palette) return conf.palette(this.index); else return null; })
@@ -281,8 +289,8 @@ BarVis.prototype.notify = function(conf) {
         .left(function(d) { return bar_scale(d.start); })
         .width(function(d) { return bar_scale(d.end) - bar_scale(d.start); })
         .strokeStyle("black")
-        .top(function(d) { // spacing for the caption + upper rows
-            return 100 + 45; }).anchor("left").add(pv.Dot).size(10);
+         // spacing for the pic
+        .top(conf.caption_pic_height + 45).anchor("left").add(pv.Dot).size(10);
 
     this.markers.anchor("right").add(pv.Dot).size(10);
 
@@ -305,7 +313,9 @@ BarVis.prototype.notify = function(conf) {
 
     this.caption_image
         .top(30)
-        .left(conf.center - 50);
+        .left(conf.center - conf.caption_pic_width / 2)
+        .width(conf.caption_pic_width)
+        .height(conf.caption_pic_height);
 
     this.label
         .font(conf.font_size + conf.font_family)
