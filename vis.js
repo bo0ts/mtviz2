@@ -91,7 +91,7 @@ function WedgeVis(panel, data) {
     // those remains constant with the data
     this.max = pv.max(this.data, function(d) { return d.end; } );
     this.wedge_scale = pv.Scale.linear(0, this.max).range(0, 2 * Math.PI);
-    
+
     this.small_data = new Array();
 
     //strip down trn sequence names and mark the small
@@ -110,13 +110,17 @@ WedgeVis.prototype.notify = function(conf) {
     conf.center = (conf.width + conf.margin) / 2;
     // XXX hack, we shouldn't access root from here
     // set all common things
-    root.top(conf.center).left(conf.center);
+    console.log(conf.center);
+    console.log(conf.radius);
+    // root.top(conf.center).left(conf.center);
 
     // closure trick
     var me = this;
 
     // full circle
     this.circle
+        .left(conf.center)
+        .top(conf.center)
         .data([0])
         .strokeStyle("black").lineWidth(1)
         .outerRadius(conf.radius - conf.barsize/2 - conf.shift/2)
@@ -124,6 +128,8 @@ WedgeVis.prototype.notify = function(conf) {
         .startAngle(0).angle(Math.PI * 2);
 
     this.value_ticks
+        .left(conf.center)
+        .top(conf.center)
         .fillStyle(null)
         .outerRadius(conf.radius + 5)
         .innerRadius(conf.radius)
@@ -133,19 +139,21 @@ WedgeVis.prototype.notify = function(conf) {
         .angle(0);
 
     this.caption_heading
-        .top(-50)
+        .top(conf.center - 50)
+        .left(conf.center)
         .textAlign("center")
         .font((parseInt(conf.font_size, 10) + 4) + conf.font_family)
         .text(conf.caption_heading);
 
     this.caption_add
-        .top(-40)
+        .top(conf.center - 40)
+        .left(conf.center)
         .textAlign("center")
         .text(conf.caption_add);
 
     this.caption_image
-        .top(-30)
-        .left(-50)
+        .top(conf.center - 30)
+        .left(conf.center - conf.caption_pic_width / 2)
         .width(conf.caption_pic_width)
         .height(conf.caption_pic_height);
 
@@ -163,6 +171,8 @@ WedgeVis.prototype.notify = function(conf) {
         .textAngle(function(d) { return Math.PI/2 + me.wedge_scale(d); } );
 
     this.wedge
+        .left(conf.center)
+        .top(conf.center)
         .data(this.data)
         .strokeStyle(conf.border_colour)
         .lineWidth(conf.border_size)
@@ -177,8 +187,10 @@ WedgeVis.prototype.notify = function(conf) {
         })
         .startAngle(function(d) { return me.wedge_scale(d.start); })
         .angle(function(d) { return me.wedge_scale(d.end) - me.wedge_scale(d.start); });
-    
+
     this.markers
+        .left(conf.center)
+        .top(conf.center)
         .data(conf.markers)
         .outerRadius(conf.radius - conf.barsize - conf.shift - 5)
         .innerRadius(conf.radius - conf.barsize - conf.shift - 10)
@@ -205,15 +217,17 @@ WedgeVis.prototype.notify = function(conf) {
 
     // // if annotations are available, render them as a heat scale
     if(this.annotations) {
-        var a_min = pv.min(this.annotations), 
-        a_median = pv.median(this.annotations), 
+        var a_min = pv.min(this.annotations),
+        a_median = pv.median(this.annotations),
         a_max = pv.max(this.annotations);
         console.log(a_min + " " + a_median + " " + a_max);
-        var heat_scale = pv.Scale.linear(pv.min(this.annotations), pv.median(this.annotations), 
+        var heat_scale = pv.Scale.linear(pv.min(this.annotations), pv.median(this.annotations),
                                          pv.max(this.annotations))
             .range('red', 'yellow', 'green');
-        
+
         anno
+            .left(conf.center)
+            .top(conf.center)
             .data(this.annotations)
             .lineWidth(0)
             .outerRadius(function(d) { return this.radius - this.shift - this.barsize; })
