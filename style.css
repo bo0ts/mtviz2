@@ -24,8 +24,9 @@ body {
 
 #vis
 {
-    float: right;
+    float: left;
     width: 60%;
+    padding-left: 50;
 }  
 
 #fig
