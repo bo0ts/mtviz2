@@ -1,4 +1,4 @@
-var data = mt2, annotations = null, vis = null;
+var data = mt1, annotations = null, vis = null;
 var root = new pv.Panel()
     .canvas('fig');
 
@@ -14,14 +14,15 @@ var conf = {
     font_size: "10px",
     border_size: 1,
     border_colour: "white",
-    strand_ticks: false,
     value_ticks: true,
     line_dist: 20,
     markers: new Array(),
     palette: pv.Colors.category20(),
-    caption_heading: "Zergling",
-    caption_add: "Where are my probes?",
-    caption_pic: "http://wiki.teamliquid.net/starcraft/images2/b/b0/Zergling.gif",
+
+    // remove unset things
+    caption_heading: "",
+    caption_add: "",
+    caption_pic: "",
     caption_pic_width: 100,
     caption_pic_height: 100,
 
@@ -54,8 +55,8 @@ var conf = {
             this[name] = "\"".concat(value, "\"");
         } else if(name == "width") {
             // width changes require adaption of the root panel
-            root.width(parseInt(value, 10)).height(parseInt(value, 10));
             this[name] = parseInt(value, 10);
+            root.width(this[name] + conf.margin).height(this[name] + conf.margin);
         } else {
             this[name] = value;
         }
@@ -106,8 +107,8 @@ function WedgeVis(panel, data) {
 
 WedgeVis.prototype.notify = function(conf) {
     // set the radius in the config
-    conf.radius = conf.width / 2;
     conf.center = (conf.width + conf.margin) / 2;
+    conf.radius = conf.width / 2;
     // XXX hack, we shouldn't access root from here
     // set all common things
     console.log(conf.center);
@@ -152,6 +153,7 @@ WedgeVis.prototype.notify = function(conf) {
         .text(conf.caption_add);
 
     this.caption_image
+        .url(conf.caption_pic)
         .top(conf.center - 30)
         .left(conf.center - conf.caption_pic_width / 2)
         .width(conf.caption_pic_width)
@@ -203,8 +205,7 @@ WedgeVis.prototype.notify = function(conf) {
     this.marker_labels
         .font(conf.font_size + conf.font_family)
         .text(function(d) { return d.name; })
-        .textAngle(function(d) { console.log(d.start + Math.abs((d.start - d.end) / 2));
-                                 return Math.PI/2 + me.wedge_scale(d.start + Math.abs((d.start - d.end) / 2)); } );
+        .textAngle(function(d) { return Math.PI/2 + me.wedge_scale(d.start + Math.abs((d.start - d.end) / 2)); } );
 
     this.markers.anchor("end").add(pv.Dot).shape("triangle").size(10)
         .angle(function(d) { return me.wedge_scale(d.end) - Math.PI/2; });
@@ -220,7 +221,6 @@ WedgeVis.prototype.notify = function(conf) {
         var a_min = pv.min(this.annotations),
         a_median = pv.median(this.annotations),
         a_max = pv.max(this.annotations);
-        console.log(a_min + " " + a_median + " " + a_max);
         var heat_scale = pv.Scale.linear(pv.min(this.annotations), pv.median(this.annotations),
                                          pv.max(this.annotations))
             .range('red', 'yellow', 'green');
@@ -326,6 +326,7 @@ BarVis.prototype.notify = function(conf) {
         .text(conf.caption_add);
 
     this.caption_image
+        .url(conf.caption_pic)
         .top(30)
         .left(conf.center - conf.caption_pic_width / 2)
         .width(conf.caption_pic_width)
