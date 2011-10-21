@@ -113,15 +113,15 @@
           <li><input type="text" name="caption_add" placeholder="Additional"
                      onchange="conf.update(this.name, this.value)"/>
           </li>
-          <li><input type="text" name="caption_add" placeholder="Picture URL"
+          <li><input type="text" name="caption_pic" placeholder="Picture URL"
                      onchange="conf.update(this.name, this.value)"/>
-          </li>
-          <li>Picture height in px
-            <input type="number" min="0"  value="100" name="caption_pic_height" step="10"
-                   onchange="conf.update(this.name, this.value);" />
           </li>
           <li>Picture width in px
             <input type="number" min="0" value="100" name="caption_pic_width" step="10"
+                   onchange="conf.update(this.name, this.value);" />
+          </li>
+          <li>Picture height in px
+            <input type="number" min="0"  value="100" name="caption_pic_height" step="10"
                    onchange="conf.update(this.name, this.value);" />
           </li>
         </ul>
