@@ -27,17 +27,17 @@ body {
     float: left;
     width: 60%;
     padding-left: 50;
-}  
+}
 
 #fig
 {
     margin-left: auto;
     margin-right: auto;
-}  
+}
 
 
 #jsddm
-{	
+{
     float: left;
     margin: 0;
     padding: 0;
@@ -52,7 +52,7 @@ body {
 }
 
 #jsddm li a
-{	
+{
     display: block;
     background: #324143;
     padding: 5px 12px;
@@ -63,12 +63,12 @@ body {
 }
 
 #jsddm li a:hover
-{	
+{
     background: #24313C
 }
 
 #jsddm li ul
-{	
+{
     display: none;
     margin: 0;
     padding: 0;
@@ -80,11 +80,26 @@ body {
 }
 
 #jsddm li ul li
-{	
+{
     height: auto;
     background: #A9C251;
     color: #24313C;
     border-top: 1px solid white;
     float: none;
     padding: 3;
+}
+
+#jsddm li ul li a
+{
+    display: block;
+    background: #A9C251;
+    color: #24313C;
+    text-decoration: none;
+    border-right: 1px solid white;
+    white-space: nowrap;
+    text-align:center;
+}
+#jsddm li ul li a:hover
+{
+    background: #A9C251;
 }
