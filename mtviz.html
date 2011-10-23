@@ -14,14 +14,16 @@
   </head>
   <body>
     <ul id="jsddm">
-      <li><a href="javascript:void(0)" onclick="hide_sub(this);">Mode</a>
+      <li><a href="javascript:void(0)" onclick="hide_sub(this);">
+          <div class="arrow-right"></div>Mode</a>
         <ul>
           <li><a href="javascript:void(0)" onclick="switch_mode(&quot;ring&quot;)">Ring</a></li>
           <li><a href="javascript:void(0)" onclick="switch_mode(&quot;bar&quot;)">Bar</a></li>
           <li>BED File<input type="file" id="input" onchange="handle(this, parseBED)"></li>
         </ul>
       </li>
-      <li><a href="javascript:void(0)" onclick="hide_sub(this);">Annotation</a>
+      <li><a href="javascript:void(0)" onclick="hide_sub(this);">
+          <div class="arrow-right"></div>Annotation</a>
         <ul>
           <li>Annotations<input type="file" id="input" onchange="handle(this, parseData)"></li>
           <li>Enable</li>
@@ -29,7 +31,8 @@
           <li>Size</li>
         </ul>
       </li>
-      <li><a href="javascript:void(0)" onclick="hide_sub(this);">Bars</a>
+      <li><a href="javascript:void(0)" onclick="hide_sub(this);">
+          <div class="arrow-right"></div>Bars</a>
         <ul>
           <li>Barsize
             <input type="range" min="10" max="100" name="barsize" value="30"
@@ -40,7 +43,7 @@
                    onchange="conf.update(this.name, this.value);" />
           </li>
           <li>Shift
-            <input type="range" min="0"  max="100" value="0" name="shift" 
+            <input type="range" min="0"  max="100" value="0" name="shift"
                    onchange="conf.update(this.name, this.value);" />
           </li>
           <li>Line number
@@ -49,14 +52,15 @@
           </li>
         </ul>
       </li>
-      <li><a href="javascript:void(0)" onclick="hide_sub(this);">Color and Border</a>
+      <li><a href="javascript:void(0)" onclick="hide_sub(this);">
+          <div class="arrow-right"></div>Color and Border</a>
         <ul>
           <li>
             <input type="checkbox" name="value_ticks"
                    onchange="conf.update(this.name, this.checked);" checked/>
             Value Ticks
           </li>
-          <li>Bordercolour
+          <li>Bordercolor
             <select name="border_colour" onchange="conf.update(this.name, this.value);" >
               <option value="white">White</option>
               <option value="black">Black</option>
@@ -73,9 +77,11 @@
               <option value="none">None</option>
               <option value="blue">Just Blue</option>
             </select>
+          </li>
         </ul>
       </li>
-      <li><a href="javascript:void(0)" onclick="hide_sub(this);">Font</a>
+      <li><a href="javascript:void(0)" onclick="hide_sub(this);">
+          <div class="arrow-right"></div>Font</a>
         <ul>
           <li>Size
             <select name="font_size" onchange="conf.update(this.name, this.value)">
@@ -85,6 +91,7 @@
               <option>16</option>
               <option>18</option>
             </select>
+          </li>
           <li>
             <select name="font_family" onchange="conf.update(this.name, this.value)">
               <option value="Times New Roman">Times New Roman</option>
@@ -94,9 +101,11 @@
               <option value="Courier New">Courier New</option>
               <option value="Lucida Console">Lucida Console</option>
             </select>
+          </li>
         </ul>
       </li>
-      <li><a href="javascript:void(0)" onclick="hide_sub(this);">Marker</a>
+      <li><a href="javascript:void(0)" onclick="hide_sub(this);">
+          <div class="arrow-right"></div>Marker</a>
         <ul>
           <li>
           <form onsubmit="conf.add_marker(this.start.value, this.end.value, this.name.value); return false;">
@@ -107,7 +116,8 @@
           </form>
           </li>
         </ul>
-      <li><a href="javascript:void(0)" onclick="hide_sub(this);">Caption</a>
+      <li><a href="javascript:void(0)" onclick="hide_sub(this);">
+          <div class="arrow-right"></div>Caption</a>
         <ul>
           <li><input type="text" name="caption_heading" placeholder="Heading"
                      onchange="conf.update(this.name, this.value)"/>
@@ -129,6 +139,19 @@
         </ul>
       </li>
       <li><a href="javascript:void(0)" onclick="exportSVG()">Export SVG</a></li>
+      <li><a href="javascript:void(0)" onclick="hide_sub(this);">
+          <div class="arrow-right"></div>Examples</a>
+        <ul>
+          <li>
+            <a href="javascript:void(0)" onclick="pantheraRing();">Panthera Tigris (Ring)</a>
+          </li>
+          <li>
+            <a href="javascript:void(0)" onclick="astroBar();">Astropecten Polyacanthus (Bars)</a>
+          </li>
+          <li>
+            <a href="javascript:void(0)" onclick="astroRing();">Astropecten Polyacanthus (Ring + Annotations)</a>
+          </li>
+        </ul>
     </ul>
 
     <div id="vis">
