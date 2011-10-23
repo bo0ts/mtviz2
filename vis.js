@@ -10,13 +10,13 @@ var conf = {
     shift: 0,
     lines: 1,
     circle: true,
-    font_family: "\"Verdana\"",
-    font_size: "10px",
+    font_family: 'Verdana',
+    font_size: '10px',
     border_size: 1,
-    border_colour: "white",
+    border_colour: 'white',
     value_ticks: true,
     line_dist: 20,
-    markers: new Array(),
+    markers: [],
     palette: pv.Colors.category20(),
 
     // remove unset things
@@ -28,16 +28,16 @@ var conf = {
 
     set_color: function(mode) {
         // pretty, not
-        if(mode == "full") {
+        if(mode === "full") {
             this.palette = pv.Colors.category20();
-        } else if(mode == "bw") {
+        } else if(mode === "bw") {
             this.palette = pv.Scale.linear(0, data.length).range('grey', 'white');
-        } else if(mode == "none") {
+        } else if(mode === "none") {
             console.log(mode);
             this.palette = pv.Scale.linear(0, data.length).range('white', 'white');
             // this.palette = null;
-        } else if(mode == "blue") {
-            this.palette = function() { return "#1f77b4"; }
+        } else if(mode === "blue") {
+            this.palette = function() { return "#1f77b4"; };
         }
         this.observer.notify(this);
         root.render();
@@ -50,10 +50,13 @@ var conf = {
     },
 
     update: function(name, value) {
-        if(name == "font_family") {
+        if(name === 'font_family') {
             // requote the string...
             this[name] = "\"".concat(value, "\"");
-        } else if(name == "width") {
+        } else if(name === "font_size") {
+            this[name] = value + 'px';
+            console.log(this[name]);
+        } else if(name === 'width') {
             // width changes require adaption of the root panel
             this[name] = parseInt(value, 10);
             root.width(this[name] + conf.margin).height(this[name] + conf.margin);
@@ -86,17 +89,16 @@ function WedgeVis(panel, data) {
 
     this.caption_heading = panel.add(pv.Label);
     this.caption_add = panel.add(pv.Label);
-    this.caption_image = panel.add(pv.Image).url(conf.caption_pic)
-        .width(conf.caption_pic_width).height(conf.caption_pic_height);
+    this.caption_image = panel.add(pv.Image);
 
     // those remains constant with the data
     this.max = pv.max(this.data, function(d) { return d.end; } );
     this.wedge_scale = pv.Scale.linear(0, this.max).range(0, 2 * Math.PI);
 
-    this.small_data = new Array();
+    this.small_data = [];
 
     //strip down trn sequence names and mark the small
-    for(var i in this.data) {
+    for(var i = 0; i < this.data.length; ++i) {
         if(this.data[i].name.indexOf("trn") == 0) {
 	    this.small_data.push(this.data[i]);
 	    this.data[i].name = this.data[i].name.substr(3, this.data[i].name.substr.length);
@@ -109,11 +111,6 @@ WedgeVis.prototype.notify = function(conf) {
     // set the radius in the config
     conf.center = (conf.width + conf.margin) / 2;
     conf.radius = conf.width / 2;
-    // XXX hack, we shouldn't access root from here
-    // set all common things
-    console.log(conf.center);
-    console.log(conf.radius);
-    // root.top(conf.center).left(conf.center);
 
     // closure trick
     var me = this;
@@ -212,7 +209,7 @@ WedgeVis.prototype.notify = function(conf) {
 
 
     this.labels1
-        .font(conf.font_size + conf.font_family)
+        .font(conf.font_size + ' ' + conf.font_family)
         .text(function(d) { if(!d.isSmall) return d.name; else return ""; })
         .textAngle(function(d) { return Math.PI/2 + me.wedge_scale(d.start + Math.abs((d.start - d.end) / 2)); } );
 
