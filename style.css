@@ -47,6 +47,7 @@ body {
 {
     list-style: none;
     padding: 1;
+    border-top: 2px solid white;
     font: 12px Tahoma, Arial;
     clear: both;
 }
@@ -74,7 +75,6 @@ body {
     padding: 0;
     position: relative;
     visibility: hidden;
-    border-top: 1px solid white;
     white-space: nowrap;
     float: none;
 }
@@ -102,4 +102,26 @@ body {
 #jsddm li ul li a:hover
 {
     background: #A9C251;
+}
+
+/* create an arrow that points down */
+div.arrow-down {
+  width:0px;
+  height:0px;
+  border-left:5px solid transparent;
+  border-right:5px solid transparent;
+  border-top:5px solid #2f2f2f;
+  font-size:0px;
+  line-height:0px;
+}
+
+/* create an arrow that points right */
+div.arrow-right {
+  width:0px;
+  height:0px;
+  border-bottom:5px solid transparent;  /* left arrow slant */
+  border-top:5px solid transparent; /* right arrow slant */
+  border-left:5px solid #2f2f2f; /* bottom, add background color here */
+  font-size:0px;
+  line-height:0px;
 }
