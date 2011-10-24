@@ -84,18 +84,22 @@ var conf = {
 
 function WedgeVis(panel) {
     // the ordering of the "adds" is important for the overdraw
-    this.circle = panel.add(pv.Wedge);
+
+    // dummy to collect common properties for wedges
+    this.dummy = new pv.Wedge();
+
+    this.circle = panel.add(pv.Wedge).extend(this.dummy);
     this.circle.anchor("start").add(pv.Dot).shape("triangle").fillStyle("grey");
 
-    this.wedge = panel.add(pv.Wedge);
+    this.wedge = panel.add(pv.Wedge).extend(this.dummy);
     this.labels1 = this.wedge.anchor("center").add(pv.Label);
 
-    this.fat_borders = panel.add(pv.Wedge);
+    this.fat_borders = panel.add(pv.Wedge).extend(this.wedge);
 
-    this.value_ticks = panel.add(pv.Wedge);
+    this.value_ticks = panel.add(pv.Wedge).extend(this.dummy);
     this.value_labels = this.value_ticks.anchor("center").add(pv.Label);
 
-    this.markers = panel.add(pv.Wedge);
+    this.markers = panel.add(pv.Wedge).extend(this.wedge);
     this.marker_labels = this.markers.anchor("center").add(pv.Label);
 
     this.anno = panel.add(pv.Wedge);
@@ -128,26 +132,32 @@ WedgeVis.prototype.notify = function(conf) {
     var max = pv.max(data, function(d) { return d.end; } );
     var wedge_scale = pv.Scale.linear(0, max).range(0, 2 * Math.PI);
 
-    // full circle
-    this.circle
+    this.dummy
         .left(conf.center)
         .top(conf.center)
-        .data([0])
         .strokeStyle("black").lineWidth(1)
+        .fillStyle(null);
+
+    // full circle
+    this.circle
+        .data([0])
         .outerRadius(conf.radius - conf.barsize/2 - conf.shift/2)
         .innerRadius(conf.radius - conf.barsize/2 - conf.shift/2)
         .startAngle(0).angle(Math.PI * 2);
 
     this.value_ticks
-        .left(conf.center)
-        .top(conf.center)
-        .fillStyle(null)
         .outerRadius(conf.radius + 5)
         .innerRadius(conf.radius)
         .startAngle(function(d) { return wedge_scale(d); })
-        .strokeStyle("black")
-        .lineWidth(1)
         .angle(0);
+
+    if(conf.value_ticks) {
+        this.value_ticks
+            .data(wedge_scale.ticks());
+    } else {
+        this.value_ticks
+            .data([]);
+    }
 
     this.caption_heading
         .top(conf.center - 50)
@@ -169,22 +179,12 @@ WedgeVis.prototype.notify = function(conf) {
         .width(conf.caption_pic_width)
         .height(conf.caption_pic_height);
 
-    if(conf.value_ticks) {
-        this.value_ticks
-            .data(wedge_scale.ticks());
-    } else {
-        this.value_ticks
-            .data([]);
-    }
-
     this.value_labels
         .font(conf.font_size + conf.font_family)
         .textBaseline("bottom")
         .textAngle(function(d) { return Math.PI/2 + wedge_scale(d); } );
 
     this.wedge
-        .left(conf.center)
-        .top(conf.center)
         .data(data)
         .strokeStyle(conf.border_colour)
         .lineWidth(conf.border_size)
@@ -201,14 +201,10 @@ WedgeVis.prototype.notify = function(conf) {
         .angle(function(d) { return wedge_scale(d.end) - wedge_scale(d.start); });
 
     this.markers
-        .left(conf.center)
-        .top(conf.center)
         .data(conf.markers)
         .outerRadius(conf.radius - conf.barsize - conf.shift - 5)
         .innerRadius(conf.radius - conf.barsize - conf.shift - 10)
         .fillStyle("grey")
-        .startAngle(function(d) { return wedge_scale(d.start); })
-        .angle(function(d) { return wedge_scale(d.end) - wedge_scale(d.start); })
         .anchor("start").add(pv.Dot).shape("triangle").size(10)
         .angle(function(d) { return wedge_scale(d.start) - Math.PI/2; });
 
@@ -220,17 +216,13 @@ WedgeVis.prototype.notify = function(conf) {
     this.markers.anchor("end").add(pv.Dot).shape("triangle").size(10)
         .angle(function(d) { return wedge_scale(d.end) - Math.PI/2; });
 
-
     this.labels1
         .font(conf.font_size + ' ' + conf.font_family)
         .text(function(d) { if(!d.isSmall) return d.name; else return ""; })
         .textAngle(function(d) { return Math.PI/2 + wedge_scale(d.start + Math.abs((d.start - d.end) / 2)); } );
 
     this.fat_borders
-        .left(conf.center)
-        .top(conf.center)
         .data(function() { if(conf.fat_strands) return data; else return []; })
-        .strokeStyle('black')
         .lineWidth(3)
         .fillStyle(null)
         .outerRadius(function(d) {
@@ -240,9 +232,7 @@ WedgeVis.prototype.notify = function(conf) {
         .innerRadius(function(d) {
     	    if(d.strand == "-") { return (conf.radius - conf.shift - conf.barsize); }
     	    else { return (conf.radius); }
-        })
-        .startAngle(function(d) { return wedge_scale(d.start); })
-        .angle(function(d) { return wedge_scale(d.end) - wedge_scale(d.start); });
+        });
 
     // if annotations are available, render them as a heat scale
     this.anno
