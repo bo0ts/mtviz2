@@ -43,7 +43,13 @@ var conf = {
             this.palette = pv.Scale.linear(0, data.length).range('grey', 'white');
         } else if(mode === "none") {
             this.palette = pv.Scale.linear(0, data.length).range('white', 'white');
-            // this.palette = null;
+        } else if(mode === 'gene') {
+            // this is one hell of hack
+            console.log('gene coding');
+            this.palette = function(d) { 
+                if(data[d].name.length === 1) 
+                    return '#87ACDD'; else return '#DEB887'; 
+            }
         } else if(mode === "blue") {
             this.palette = function() { return "#1f77b4"; };
         }
@@ -271,7 +277,6 @@ function BarVis(panel, data) {
 
     this.markers = panel.add(pv.Rule);
     this.marker_labels = this.markers.anchor("top").add(pv.Label);
-
 
     this.small_data = new Array();
     //strip down trn sequence names and mark the small
