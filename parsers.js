@@ -32,6 +32,8 @@ function parseBED(bed_string) {
         obj.strand = elems[5];
         data.push(obj);
     }
+
+    conf.notify();
 }
 
 function parseData(data) {  
@@ -43,7 +45,15 @@ function parseData(data) {
     }
 
     console.log("parsing: " + lines.length + " lines");
+    annotations = { data: [] };
 
-    annotations = new Array();
-    lines.forEach(function(d) { annotations.push(parseFloat(d)); });
+    lines.forEach(function(d) { annotations.data.push(parseFloat(d)); });
+
+    annotations.min = pv.min(annotations.data);
+    annotations.median = pv.median(annotations.data);
+    annotations.max = pv.max(annotations.data);
+    annotations.scale = pv.Scale.linear(annotations.min, annotations.median, annotations.max)
+        .range('red', 'yellow', 'green');
+
+    conf.notify();
 }

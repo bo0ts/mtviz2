@@ -32,9 +32,18 @@
       <li><a href="javascript:void(0)" onclick="hide_sub(this);">
           <div class="arrow-right"></div>Annotation</a>
         <ul>
-          <li>Enable</li>
-          <li>Offset</li>
-          <li>Size</li>
+          <li>Enable<input type="checkbox" name="anno_enable"
+                   onchange="conf.update(this.name, this.checked);" checked/>
+          </li>
+          <!-- <li>Offset -->
+          <!--   <input type="number" min="1"  max="100" value="10" name="anno_offset" step="1" -->
+          <!--          onchange="conf.update(this.name, this.value);" /> -->
+          <!-- </li> -->
+          <!-- <li>Size -->
+          <!--   <input type="number" min="1"  max="100" value="10" name="anno_size" step="1" -->
+          <!--          onchange="conf.update(this.name, this.value);" /> -->
+            
+          <!-- </li> -->
         </ul>
       </li>
       <li><a href="javascript:void(0)" onclick="hide_sub(this);">
@@ -62,9 +71,9 @@
           <div class="arrow-right"></div>Color and Border</a>
         <ul>
           <li>
+            Value Ticks
             <input type="checkbox" name="value_ticks"
                    onchange="conf.update(this.name, this.checked);" checked/>
-            Value Ticks
           </li>
           <li>Bordercolor
             <select name="border_colour" onchange="conf.update(this.name, this.value);" >
@@ -153,9 +162,6 @@
           </li>
           <li>
             <a href="javascript:void(0)" onclick="astroBar();">Astropecten Polyacanthus (Bars)</a>
-          </li>
-          <li>
-            <a href="javascript:void(0)" onclick="astroRing();">Astropecten Polyacanthus (Ring + Annotations)</a>
           </li>
         </ul>
     </ul>
