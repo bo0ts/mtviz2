@@ -1,9 +1,11 @@
-var data = mt1, annotations = null, vis = null;
-var root = new pv.Panel()
-    .canvas('fig');
+var data = [], annotations = null, root = new pv.Panel().canvas('fig'), 
+vis = new WedgeVis(root, data);
+var timer;
 
 // this is madness
 var conf = {
+    observer: vis,
+
     width: 600,
     margin: 30,
     barsize: 30,
@@ -50,6 +52,9 @@ var conf = {
     },
 
     update: function(name, value) {
+        var d = new Date();
+        timer = d.getTime();
+
         if(name === 'font_family') {
             // requote the string...
             this[name] = "\"".concat(value, "\"");
@@ -69,9 +74,7 @@ var conf = {
     }
 };
 
-function WedgeVis(panel, data) {
-    this.data = data;
-
+function WedgeVis(panel) {
     // the ordering of the "adds" is important for the overdraw
     this.circle = panel.add(pv.Wedge);
     this.circle.anchor("start").add(pv.Dot).shape("triangle").fillStyle("grey");
@@ -92,17 +95,17 @@ function WedgeVis(panel, data) {
     this.caption_image = panel.add(pv.Image);
 
     // those remains constant with the data
-    this.max = pv.max(this.data, function(d) { return d.end; } );
+    this.max = pv.max(data, function(d) { return d.end; } );
     this.wedge_scale = pv.Scale.linear(0, this.max).range(0, 2 * Math.PI);
 
     this.small_data = [];
 
     //strip down trn sequence names and mark the small
-    for(var i = 0; i < this.data.length; ++i) {
-        if(this.data[i].name.indexOf("trn") == 0) {
-	    this.small_data.push(this.data[i]);
-	    this.data[i].name = this.data[i].name.substr(3, this.data[i].name.substr.length);
-            this.data[i].isSmall = true;
+    for(var i = 0; i < data.length; ++i) {
+        if(data[i].name.indexOf("trn") == 0) {
+	    this.small_data.push(data[i]);
+	    data[i].name = data[i].name.substr(3, data[i].name.substr.length);
+            data[i].isSmall = true;
         }
     }
 }
@@ -172,7 +175,7 @@ WedgeVis.prototype.notify = function(conf) {
     this.wedge
         .left(conf.center)
         .top(conf.center)
-        .data(this.data)
+        .data(data)
         .strokeStyle(conf.border_colour)
         .lineWidth(conf.border_size)
         .fillStyle(function(d) { return conf.palette(this.index); })
@@ -213,7 +216,7 @@ WedgeVis.prototype.notify = function(conf) {
         .text(function(d) { if(!d.isSmall) return d.name; else return ""; })
         .textAngle(function(d) { return Math.PI/2 + me.wedge_scale(d.start + Math.abs((d.start - d.end) / 2)); } );
 
-    // // if annotations are available, render them as a heat scale
+    // if annotations are available, render them as a heat scale
     if(this.annotations) {
         var a_min = pv.min(this.annotations),
         a_median = pv.median(this.annotations),
@@ -233,12 +236,16 @@ WedgeVis.prototype.notify = function(conf) {
             .angle(function(d) { return ws(1); })
             .fillStyle(heat_scale);
     }
+
+    console.log(timer);
+    var d = new Date();
+    var timing = d.getTime() - timer;
+    console.log("Rendering time: " + timing);
 };
 
 function BarVis(panel, data) {
     this.max = pv.max(data, function(d) { return d.end; } );
 
-    this.data = data;
     this.bars = panel.add(pv.Bar);
     this.label = this.bars.anchor("center").add(pv.Label);
 
@@ -253,11 +260,11 @@ function BarVis(panel, data) {
 
     this.small_data = new Array();
     //strip down trn sequence names and mark the small
-    for(var i in this.data) {
-        if(this.data[i].name.indexOf("trn") == 0) {
-	    this.small_data.push(this.data[i]);
-	    this.data[i].name = this.data[i].name.substr(3, this.data[i].name.substr.length);
-            this.data[i].isSmall = true;
+    for(var i in data) {
+        if(data[i].name.indexOf("trn") == 0) {
+	    this.small_data.push(data[i]);
+	    data[i].name = data[i].name.substr(3, data[i].name.substr.length);
+            data[i].isSmall = true;
         }
     }
 }
@@ -269,21 +276,21 @@ BarVis.prototype.notify = function(conf) {
 
     var line_tmp = 0;
     var break_point = 0;
-    for(var i = 0; i < this.data.length; ++i) {
-        delete this.data[i].breakpoint;
+    for(var i = 0; i < data.length; ++i) {
+        delete data[i].breakpoint;
     }
 
-    for(var i = 0; i < this.data.length; ++i) {
-        if(bar_scale(this.data[i].end) > (conf.width * (line_tmp + 1))) {
+    for(var i = 0; i < data.length; ++i) {
+        if(bar_scale(data[i].end) > (conf.width * (line_tmp + 1))) {
             ++line_tmp;
-            break_point = this.data[i-1].end;
+            break_point = data[i-1].end;
         }
-        this.data[i].line = line_tmp;
-        this.data[i].break_point = break_point;
+        data[i].line = line_tmp;
+        data[i].break_point = break_point;
     }
 
     this.bars
-        .data(this.data)
+        .data(data)
         .left(function(d) { return bar_scale(d.start) - bar_scale(d.break_point); })
         .width(function(d) { return bar_scale(d.end) - bar_scale(d.start); })
         .top(function(d) { // spacing for the caption + upper rows

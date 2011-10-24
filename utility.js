@@ -20,11 +20,12 @@ function switch_mode(mode) {
     // update the reference in the config
     conf.panel = root;
 
-    if(mode == "ring") {
+    if(mode === modes.RING) {
         vis = new WedgeVis(root, data);
+        console.log("ring");
     }
 
-    if(mode == "bar") {
+    if(mode === modes.BAR) {
         vis = new BarVis(root, data);
     }
 
@@ -81,13 +82,48 @@ function hide(e) {
     }
 }
 
-
 function getTextWidth(text, fstyle) {
     var e = document.createElement("div");
     e.style.position = "absolute";
+    e.style.visibility = "hidden";
     e.style.width = "auto";
-    e.style.
+    e.style.font = fstyle;
     e.innerHTML = text;
-    document.appendChild(e);
-    return e.clientWidth;
+    document.body.appendChild(e);
+    var size = e.clientWidth;
+    document.body.removeChild(e);
+    return size;
+}
+
+// examples
+
+function pantheraRing() {
+    data = mt2;
+    conf.caption_heading = 'Panthera Tigris';
+    conf.caption_add = 'A tiger!'
+    conf.caption_pic = 'http://upload.wikimedia.org/wikipedia/commons/a/a4/Tiger_in_the_water.jpg'
+    conf.caption_pic_width = 166;
+    conf.caption_pic_height = 133;
+
+    conf.width = 400;
+    conf.barsize = 20;
+    conf.shift = 10;
+
+    conf.border_colour = 'black';
+
+    switch_mode(modes.RING);
+}
+
+function astroBar() {
+    data = mt1;
+    conf.caption_heading = 'Astropecten polyacanthus';
+    conf.caption_add = ''
+    conf.caption_pic = 'http://www.scuba-equipment-usa.com/marine/MAY04/images/Astropecten_polyacanthus.jpg'
+    conf.caption_pic_width = 640 / 3;
+    conf.caption_pic_height = 492 / 3;
+
+    conf.border_colour = 'black';
+    conf.set_color('none');
+
+    switch_mode(modes.BAR);
 }

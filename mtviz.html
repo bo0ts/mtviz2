@@ -15,17 +15,23 @@
   <body>
     <ul id="jsddm">
       <li><a href="javascript:void(0)" onclick="hide_sub(this);">
+          <div class="arrow-right"></div>Files</a>
+        <ul>
+          <li>BED File<input type="file" id="input" onchange="handle(this, parseBED)"></li>
+          <li>Annotations<input type="file" id="input" onchange="handle(this, parseData)"></li>
+        </ul>
+      </li>
+
+      <li><a href="javascript:void(0)" onclick="hide_sub(this);">
           <div class="arrow-right"></div>Mode</a>
         <ul>
-          <li><a href="javascript:void(0)" onclick="switch_mode(&quot;ring&quot;)">Ring</a></li>
-          <li><a href="javascript:void(0)" onclick="switch_mode(&quot;bar&quot;)">Bar</a></li>
-          <li>BED File<input type="file" id="input" onchange="handle(this, parseBED)"></li>
+          <li><a href="javascript:void(0)" onclick="switch_mode(modes.RING)">Ring</a></li>
+          <li><a href="javascript:void(0)" onclick="switch_mode(modes.BAR)">Bar</a></li>
         </ul>
       </li>
       <li><a href="javascript:void(0)" onclick="hide_sub(this);">
           <div class="arrow-right"></div>Annotation</a>
         <ul>
-          <li>Annotations<input type="file" id="input" onchange="handle(this, parseData)"></li>
           <li>Enable</li>
           <li>Offset</li>
           <li>Size</li>
@@ -39,7 +45,7 @@
                    onchange="conf.update(this.name, this.value);" />
           </li>
           <li>Width
-            <input type="range" min="200" max="1000" name="width" value="600"
+            <input type="range" min="200" max="1000" name="width" value="800"
                    onchange="conf.update(this.name, this.value);" />
           </li>
           <li>Shift
