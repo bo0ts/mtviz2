@@ -18,6 +18,8 @@ var conf = {
     border_colour: 'white',
     value_ticks: true,
     line_dist: 20,
+    fat_strands: false,
+
     markers: [],
     palette: pv.Colors.category20(),
 
@@ -87,6 +89,8 @@ function WedgeVis(panel) {
 
     this.wedge = panel.add(pv.Wedge);
     this.labels1 = this.wedge.anchor("center").add(pv.Label);
+
+    this.fat_borders = panel.add(pv.Wedge);
 
     this.value_ticks = panel.add(pv.Wedge);
     this.value_labels = this.value_ticks.anchor("center").add(pv.Label);
@@ -221,6 +225,24 @@ WedgeVis.prototype.notify = function(conf) {
         .font(conf.font_size + ' ' + conf.font_family)
         .text(function(d) { if(!d.isSmall) return d.name; else return ""; })
         .textAngle(function(d) { return Math.PI/2 + wedge_scale(d.start + Math.abs((d.start - d.end) / 2)); } );
+
+    this.fat_borders
+        .left(conf.center)
+        .top(conf.center)
+        .data(function() { if(conf.fat_strands) return data; else return []; })
+        .strokeStyle('black')
+        .lineWidth(3)
+        .fillStyle(null)
+        .outerRadius(function(d) {
+    	    if(d.strand == "-") { return (conf.radius - conf.shift - conf.barsize); }
+    	    else { return (conf.radius); }
+        })
+        .innerRadius(function(d) {
+    	    if(d.strand == "-") { return (conf.radius - conf.shift - conf.barsize); }
+    	    else { return (conf.radius); }
+        })
+        .startAngle(function(d) { return wedge_scale(d.start); })
+        .angle(function(d) { return wedge_scale(d.end) - wedge_scale(d.start); });
 
     // if annotations are available, render them as a heat scale
     this.anno

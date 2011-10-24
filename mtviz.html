@@ -73,7 +73,12 @@
           <li>
             Value Ticks
             <input type="checkbox" name="value_ticks"
-                   onchange="conf.update(this.name, this.checked);" checked/>
+                   onchange="conf.update(this.name, this.checked);" checked="yes"/>
+          </li>
+          <li>
+            Fat strand borders
+            <input type="checkbox" name="fat_strands"
+                   onchange="conf.update(this.name, this.checked);"/>
           </li>
           <li>Bordercolor
             <select name="border_colour" onchange="conf.update(this.name, this.value);" >
