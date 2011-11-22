@@ -30,6 +30,12 @@ function parseBED(bed_string) {
         obj.name = elems[3];
         obj.foo = elems[4];
         obj.strand = elems[5];
+
+        // strip trn
+        if(obj.name.indexOf("trn") == 0) {
+	    obj.name = obj.name.substr(3, obj.name.substr.length);
+        }
+        
         data.push(obj);
     }
 

@@ -7,8 +7,9 @@ var conf = {
     observer: vis,
 
     width: 600,
-    margin: 30,
+    margin: 50,
     barsize: 30,
+    filter_smalls: false,
     shift: 0,
     lines: 1,
     circle: true,
@@ -45,7 +46,6 @@ var conf = {
             this.palette = pv.Scale.linear(0, data.length).range('white', 'white');
         } else if(mode === 'gene') {
             // this is one hell of hack
-            console.log('gene coding');
             this.palette = function(d) { 
                 if(data[d].name.length === 1) 
                     return '#87ACDD'; else return '#DEB887'; 
@@ -75,6 +75,10 @@ var conf = {
             // width changes require adaption of the root panel
             this[name] = parseInt(value, 10);
             root.width(this[name] + conf.margin).height(this[name] + conf.margin);
+        } else if(name === 'filter_smalls') {
+            // utterly painful
+            this[name] = value;
+            this.update('width', this.width + 1);
         } else {
             this[name] = value;
         }
@@ -100,6 +104,9 @@ function WedgeVis(panel) {
     this.wedge = panel.add(pv.Wedge).extend(this.dummy);
     this.labels1 = this.wedge.anchor("center").add(pv.Label);
 
+    this.smalls = panel.add(pv.Wedge).extend(this.dummy);
+    this.labels2 = this.smalls.anchor("center").add(pv.Label);
+
     this.fat_borders = panel.add(pv.Wedge).extend(this.wedge);
 
     this.value_ticks = panel.add(pv.Wedge).extend(this.dummy);
@@ -114,16 +121,7 @@ function WedgeVis(panel) {
     this.caption_add = panel.add(pv.Label);
     this.caption_image = panel.add(pv.Image);
 
-    this.small_data = [];
-
-    //strip down trn sequence names and mark the small
-    for(var i = 0; i < data.length; ++i) {
-        if(data[i].name.indexOf("trn") == 0) {
-	    this.small_data.push(data[i]);
-	    data[i].name = data[i].name.substr(3, data[i].name.substr.length);
-            data[i].isSmall = true;
-        }
-    }
+    this.buffer_width = 0;
 }
 
 WedgeVis.prototype.notify = function(conf) {
@@ -138,6 +136,21 @@ WedgeVis.prototype.notify = function(conf) {
     var max = pv.max(data, function(d) { return d.end; } );
     var wedge_scale = pv.Scale.linear(0, max).range(0, 2 * Math.PI);
 
+    // filter out smalls and shift them
+    if(this.buffer_width != conf.width && conf.filter_smalls) {
+        this.small_data = get_smalls(data, conf, function(size) { 
+            // arc length
+            var degrees = wedge_scale(size) * (180 / Math.PI);
+            return (degrees * Math.PI * conf.radius) / 180;
+        });
+    }
+
+    if(!conf.filter_smalls) {
+        this.small_data = [];
+    }
+
+    this.buffer_width = conf.width;
+    
     this.dummy
         .left(conf.center)
         .top(conf.center)
@@ -190,6 +203,22 @@ WedgeVis.prototype.notify = function(conf) {
         .textBaseline("bottom")
         .textAngle(function(d) { return Math.PI/2 + wedge_scale(d); } );
 
+    this.smalls
+        .data(this.small_data)
+        .strokeStyle(null)
+        .lineWidth(0)
+        .fillStyle("rgba(255, 255, 255, 0)")
+        .outerRadius(function(d) {
+    	    if(d.strand == "-") { return (conf.radius - conf.barsize - conf.shift); }
+    	    else { return (conf.radius + 20); }
+        })
+        .innerRadius(function(d) {
+            if(d.strand == "-") { return (conf.radius - conf.barsize - conf.shift - 20); }
+    	    else { return (conf.radius + 20); }
+        })
+        .startAngle(function(d) { return wedge_scale(d.start); })
+        .angle(function(d) { return wedge_scale(d.end) - wedge_scale(d.start); });
+
     this.wedge
         .data(data)
         .strokeStyle(conf.border_colour)
@@ -227,6 +256,12 @@ WedgeVis.prototype.notify = function(conf) {
         .text(function(d) { if(!d.isSmall) return d.name; else return ""; })
         .textAngle(function(d) { return Math.PI/2 + wedge_scale(d.start + Math.abs((d.start - d.end) / 2)); } );
 
+    this.labels2
+        .font(conf.font_size + ' ' + conf.font_family)
+        .text(function(d) { return d.name; })
+        .textAngle(function(d) { return Math.PI/2 + wedge_scale(d.start + Math.abs((d.start - d.end) / 2)); } );
+
+
     this.fat_borders
         .data(function() { if(conf.fat_strands) return data; else return []; })
         .lineWidth(3)
@@ -261,14 +296,14 @@ WedgeVis.prototype.notify = function(conf) {
 
     var d = new Date();
     var timing = d.getTime() - timer;
-    console.log("Rendering time: " + timing);
 };
 
-function BarVis(panel, data) {
-    this.max = pv.max(data, function(d) { return d.end; } );
-
+function BarVis(panel) {
     this.bars = panel.add(pv.Bar);
+    // this.smalls = panel.add(pv.Bar);
+
     this.label = this.bars.anchor("center").add(pv.Label);
+    // this.label2 = this.smalls.anchor("center").add(pv.Label);
 
     this.caption_heading = panel.add(pv.Label);
     this.caption_add = panel.add(pv.Label);
@@ -278,48 +313,54 @@ function BarVis(panel, data) {
     this.markers = panel.add(pv.Rule);
     this.marker_labels = this.markers.anchor("top").add(pv.Label);
 
-    this.small_data = new Array();
-    //strip down trn sequence names and mark the small
-    for(var i in data) {
-        if(data[i].name.indexOf("trn") == 0) {
-	    this.small_data.push(data[i]);
-	    data[i].name = data[i].name.substr(3, data[i].name.substr.length);
-            data[i].isSmall = true;
-        }
-    }
+    this.buffer_width = 0;
 }
 
 BarVis.prototype.notify = function(conf) {
+    var max = pv.max(data, function(d) { return d.end; } );
     conf.center = (conf.width + conf.margin) / 2;
+
     var me = this,
-    bar_scale = pv.Scale.linear(0, this.max).range(0, conf.width*conf.lines);
+    bar_scale = pv.Scale.linear(0, max).range(0, conf.width*conf.lines);
+
+    // filter out smalls and shift them
+    if(this.buffer_width != conf.width && conf.filter_smalls) {
+        this.small_data = get_smalls(data, conf, function(size) { 
+            // arc length
+            var degrees = wedge_scale(size) * (180 / Math.PI);
+            return (degrees * Math.PI * conf.radius) / 180;
+        });
+    }
+
+    if(!conf.filter_smalls) {
+        this.small_data = [];
+    }
 
     var line_tmp = 0;
-    var break_point = 0;
-    for(var i = 0; i < data.length; ++i) {
-        delete data[i].breakpoint;
-    }
 
     for(var i = 0; i < data.length; ++i) {
         if(bar_scale(data[i].end) > (conf.width * (line_tmp + 1))) {
             ++line_tmp;
-            break_point = data[i-1].end;
         }
         data[i].line = line_tmp;
-        data[i].break_point = break_point;
     }
+
+    var foo;
 
     this.bars
         .data(data)
-        .left(function(d) { return bar_scale(d.start) - bar_scale(d.break_point); })
+        .left(function(d) { return conf.margin + bar_scale(d.start) - d.line*conf.width; })
         .width(function(d) { return bar_scale(d.end) - bar_scale(d.start); })
         .top(function(d) { // spacing for the caption + upper rows
             // parseInt yeah
-            return parseInt(conf.caption_pic_height, 10) + 50 + (conf.barsize + conf.line_dist) * d.line; })
+            return parseInt(conf.caption_pic_height, 10) + 55 + (conf.barsize) * d.line; })
         .height(conf.barsize)
         .lineWidth(conf.border_size)
         .fillStyle(function(d) { if(conf.palette) return conf.palette(this.index); else return null; })
         .strokeStyle(conf.border_colour);
+
+    // this.smalls
+    //     .data(small_data)
 
     // XXX calculate the break points for the markers
     this.markers

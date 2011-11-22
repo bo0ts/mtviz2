@@ -61,6 +61,11 @@
             <input type="range" min="0"  max="100" value="0" name="shift"
                    onchange="conf.update(this.name, this.value);" />
           </li>
+          <li>
+            Filter Small Elements
+            <input type="checkbox" name="filter_smalls"
+                   onchange="conf.update(this.name, this.checked);"/>
+          </li>
           <li>Line number
             <input type="number" min="1"  max="5" value="1" name="lines" step="1"
                    onchange="conf.update(this.name, this.value);" />
